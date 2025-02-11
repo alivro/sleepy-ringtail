@@ -1,0 +1,13 @@
+environment:
+  name: prod
+server:
+  port:
+    8080
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/sleepy_ringtail
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: validate

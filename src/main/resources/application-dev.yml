@@ -1,0 +1,24 @@
+environment:
+  name: dev
+server:
+  port:
+    8082
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/sleepy_ringtail_dev
+    username: postgres
+    password: postgres
+  jpa:
+    defer-datasource-initialization: true       # Ejecuta script data.sql después de inicializar Hibernate
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: true
+  #    properties:
+  #      hibernate:
+  #        dialect: org.hibernate.dialect.PostgreSQLDialect
+  sql:
+    init:
+      mode: always                              # Siempre inicializa la base de datos

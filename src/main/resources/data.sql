@@ -1,0 +1,7 @@
+INSERT INTO categories (name, description) VALUES ('Bebidas', null)
+INSERT INTO categories (name, description) VALUES ('Helados', null)
+INSERT INTO categories (name, description) VALUES ('Lácteos', null)
+INSERT INTO categories (name, description) VALUES ('Panes', null)
+INSERT INTO categories (name, description) VALUES ('Dulcería', null)
+INSERT INTO categories (name, description) VALUES ('Botanas', null)
+INSERT INTO categories (name, description) VALUES ('Vinos', null)

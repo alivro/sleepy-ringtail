@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: SleepyRingtail
+  output:
+    ansi:
+      enabled: always       # Habilitar salida en color ANSI
+  profiles:
+    active: 'dev'

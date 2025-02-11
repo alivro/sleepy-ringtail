@@ -62,7 +62,7 @@ public class CategoryController {
      * @return Información de la categoría buscada
      */
     @GetMapping("/get/{id}")
-    public ResponseEntity<CustomResponse<CategoryGetResponseDto, Void>> getCategory(@PathVariable("id") long id) {
+    public ResponseEntity<CustomResponse<CategoryGetResponseDto, Void>> getCategory(@PathVariable("id") Integer id) {
         CategoryGetResponseDto foundCategory = categoryService.findById(id);
 
         logger.info("Categoría encontrada. ID: {}", id);
@@ -99,7 +99,7 @@ public class CategoryController {
      */
     @PutMapping("/update/{id}")
     public ResponseEntity<CustomResponse<CategorySaveResponseDto, Void>> updateCategory(
-            @PathVariable("id") long id, @Valid @RequestBody CategorySaveRequestDto category) {
+            @PathVariable("id") Integer id, @Valid @RequestBody CategorySaveRequestDto category) {
         CategorySaveResponseDto updatedCategory = categoryService.update(id, category);
 
         logger.info("Categoría actualizada. ID: {}", id);
@@ -116,7 +116,7 @@ public class CategoryController {
      * @return Estatus 200
      */
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<CustomResponse<Void, Void>> deleteCategory(@PathVariable("id") long id) {
+    public ResponseEntity<CustomResponse<Void, Void>> deleteCategory(@PathVariable("id") Integer id) {
         categoryService.deleteById(id);
 
         logger.info("Categoría eliminada. ID: {}", id);

@@ -21,7 +21,7 @@ public interface ICategoryService {
      * @param id Identificador único de la categoría
      * @return Información de la categoría buscada
      */
-    CategoryGetResponseDto findById(Long id);
+    CategoryGetResponseDto findById(Integer id);
 
     /**
      * Método para guardar una nueva categoría
@@ -38,12 +38,12 @@ public interface ICategoryService {
      * @param category Información de la categoría  a actualizar
      * @return Información de la categoría actualizado
      */
-    CategorySaveResponseDto update(Long id, CategorySaveRequestDto category);
+    CategorySaveResponseDto update(Integer id, CategorySaveRequestDto category);
 
     /**
      * Método para eliminar una categoría por su ID
      *
      * @param id Identificador único de la categoría
      */
-    void deleteById(Long id);
+    void deleteById(Integer id);
 }

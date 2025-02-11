@@ -60,7 +60,7 @@ public class ICategoryServiceImpl implements ICategoryService {
      * @return Información de la categoría buscada
      */
     @Override
-    public CategoryGetResponseDto findById(Long id) {
+    public CategoryGetResponseDto findById(Integer id) {
         logger.info("Busca categoría. ID: {}", id);
 
         Optional<Category> foundCategory = categoryDao.findById(id);
@@ -113,7 +113,7 @@ public class ICategoryServiceImpl implements ICategoryService {
      * @return Información de la categoría actualizado
      */
     @Override
-    public CategorySaveResponseDto update(Long id, CategorySaveRequestDto category) {
+    public CategorySaveResponseDto update(Integer id, CategorySaveRequestDto category) {
         logger.info("Busca categoría. ID: {}", id);
 
         Optional<Category> foundCategory = categoryDao.findById(id);
@@ -145,7 +145,7 @@ public class ICategoryServiceImpl implements ICategoryService {
      * @param id Identificador único de la categoría
      */
     @Override
-    public void deleteById(Long id) {
+    public void deleteById(Integer id) {
         logger.info("Elimina categoría. ID: {}", id);
 
         categoryDao.deleteById(id);

@@ -5,7 +5,7 @@ server:
     8082
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/sleepy_ringtail_dev
+    url: jdbc:postgresql://192.168.100.11:5432/sleepy_ringtail_dev
     username: postgres
     password: postgres
   jpa:

@@ -37,7 +37,7 @@ public class ICategoryServiceImpl implements ICategoryService {
     /**
      * Método para buscar todas las categorías
      *
-     * @return Información de todos las categorías
+     * @return Información de todas las categorías
      */
     @Override
     public CustomPaginationData<CategoryGetResponseDto, Category> findAll(Pageable pageable) {
@@ -50,7 +50,7 @@ public class ICategoryServiceImpl implements ICategoryService {
                 .map(CategoryGetResponseDto::mapEntityToResponseDto)
                 .toList();
 
-        return new CustomPaginationData<CategoryGetResponseDto, Category>(foundCategories, categoriesPage);
+        return new CustomPaginationData<>(foundCategories, categoriesPage);
     }
 
     /**
@@ -66,7 +66,7 @@ public class ICategoryServiceImpl implements ICategoryService {
         Optional<Category> foundCategory = categoryDao.findById(id);
 
         if (foundCategory.isEmpty()) {
-            logger.info("Categoría no encontrado. ID: {}", id);
+            logger.info("Categoría no encontrada. ID: {}", id);
 
             throw new DataNotFoundException("Category not found!");
         }
@@ -77,19 +77,19 @@ public class ICategoryServiceImpl implements ICategoryService {
     /**
      * Método para guardar una nueva categoría
      *
-     * @param category Información de la categoría a guardar
-     * @return Información de la categoría guardado
+     * @param request Información de la categoría a guardar
+     * @return Información de la categoría guardada
      */
     @Override
-    public CategorySaveResponseDto save(CategorySaveRequestDto category) {
-        String name = category.getName();
+    public CategorySaveResponseDto save(CategorySaveRequestDto request) {
+        String name = request.getName();
 
         logger.info("Busca categoría. Nombre: {}", name);
 
-        // Verifica si ya existe un categoría con el mismo nombre
+        // Verifica si ya existe una categoría con el mismo nombre
         if (categoryDao.existsByName(name)) {
             logger.info("Categoría existente. Nombre: {}", name);
-            logger.info("Categoría no guardado. Nombre: {}", name);
+            logger.info("Categoría no guardada. Nombre: {}", name);
 
             throw new DataAlreadyExistsException("Category already exists!");
         }
@@ -99,7 +99,7 @@ public class ICategoryServiceImpl implements ICategoryService {
 
         // Guarda la información de la nueva categoría
         Category savedCategory = categoryDao.save(
-                CategorySaveRequestDto.mapRequestDtoToEntity(category)
+                CategorySaveRequestDto.mapRequestDtoToEntity(request)
         );
 
         return CategorySaveResponseDto.mapEntityToResponseDto(savedCategory);
@@ -108,12 +108,12 @@ public class ICategoryServiceImpl implements ICategoryService {
     /**
      * Método para actualizar la información de una categoría
      *
-     * @param id       Identificador único de la categoría
-     * @param category Información de la categoría  a actualizar
-     * @return Información de la categoría actualizado
+     * @param id      Identificador único de la categoría
+     * @param request Información de la categoría a actualizar
+     * @return Información de la categoría actualizada
      */
     @Override
-    public CategorySaveResponseDto update(Integer id, CategorySaveRequestDto category) {
+    public CategorySaveResponseDto update(Integer id, CategorySaveRequestDto request) {
         logger.info("Busca categoría. ID: {}", id);
 
         Optional<Category> foundCategory = categoryDao.findById(id);
@@ -121,15 +121,15 @@ public class ICategoryServiceImpl implements ICategoryService {
         // Verifica si existe una categoría con ese id
         if (foundCategory.isEmpty()) {
             logger.info("Categoría no existente. ID: {}", id);
-            logger.info("Categoría no actualizado. ID: {}", id);
+            logger.info("Categoría no actualizada. ID: {}", id);
 
             throw new DataNotFoundException("Category does not exist!");
         }
 
         // Información de la categoría a actualizar
         Category categoryToUpdate = foundCategory.get();
-        categoryToUpdate.setName(category.getName());
-        categoryToUpdate.setDescription(category.getDescription());
+        categoryToUpdate.setName(request.getName());
+        categoryToUpdate.setDescription(request.getDescription());
 
         logger.info("Actualiza categoría. ID: {}", id);
 

@@ -23,25 +23,25 @@ public class CategorySaveRequestDto {
     /**
      * Convierte un objeto RequestDto en un objeto Entity
      *
-     * @param category Información de la categoría
+     * @param request Información de la categoría
      * @return Representación Entity de la información de la categoría
      */
-    public static Category mapRequestDtoToEntity(CategorySaveRequestDto category) {
+    public static Category mapRequestDtoToEntity(CategorySaveRequestDto request) {
         return Category.builder()
-                .name(category.getName())
-                .description(category.getDescription())
+                .name(request.getName())
+                .description(request.getDescription())
                 .build();
     }
 
     /**
      * Convierte un objeto RequestDto en un objeto Entity
      *
-     * @param id       Identificador único de la categoría
-     * @param category Información de la categoría
-     * @return Representación Entity de la información del categoría
+     * @param id      Identificador único de la categoría
+     * @param request Información de la categoría
+     * @return Representación Entity de la información de la categoría
      */
-    public static Category mapRequestDtoToEntity(Integer id, CategorySaveRequestDto category) {
-        return mapRequestDtoToEntity(category)
+    public static Category mapRequestDtoToEntity(Integer id, CategorySaveRequestDto request) {
+        return mapRequestDtoToEntity(request)
                 .toBuilder()
                 .id(id)
                 .build();

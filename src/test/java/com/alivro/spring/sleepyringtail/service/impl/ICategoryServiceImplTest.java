@@ -4,6 +4,7 @@ import com.alivro.spring.sleepyringtail.dao.CategoryDao;
 import com.alivro.spring.sleepyringtail.exception.DataAlreadyExistsException;
 import com.alivro.spring.sleepyringtail.exception.DataNotFoundException;
 import com.alivro.spring.sleepyringtail.model.Category;
+import com.alivro.spring.sleepyringtail.model.Subcategory;
 import com.alivro.spring.sleepyringtail.model.category.request.CategorySaveRequestDto;
 import com.alivro.spring.sleepyringtail.model.category.response.CategoryGetResponseDto;
 import com.alivro.spring.sleepyringtail.model.category.response.CategorySaveResponseDto;
@@ -22,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,61 +46,85 @@ public class ICategoryServiceImplTest {
     private ICategoryServiceImpl categoryService;
 
     // Buscar todas las categorías
-    private static Category drinks;
-    private static Category iceCreams;
-    private static Category snacks;
-    private static Category sweets;
+    private static Category bebidas;
+    private static Category helados;
+    private static Category botanas;
+    private static Category dulces;
 
     // Guardar una nueva categoría
-    private static CategorySaveRequestDto categorySaveRequestWines;
-    private static Category categoryToSaveWines;
-    private static Category categorySavedWines;
+    private static CategorySaveRequestDto categorySaveRequestVinos;
+    private static Category categoryToSaveVinos;
+    private static Category categorySavedVinos;
 
     // Actualizar una categoría existente
-    private static CategorySaveRequestDto categoryUpdateRequestWines;
-    private static Category categoryToUpdateWines;
-    private static Category categoryUpdatedWines;
+    private static CategorySaveRequestDto categoryUpdateRequestVinos;
+    private static Category categoryToUpdateVinos;
+    private static Category categoryUpdatedVinos;
 
     @BeforeAll
     public static void setup() {
         // Buscar todas las categorías
-        drinks = Category.builder()
+        Subcategory papasFritas = Subcategory.builder()
+                .id(1)
+                .name("Papas fritas")
+                .build();
+
+        Subcategory aguaMineral = Subcategory.builder()
+                .id(2)
+                .name("Agua mineral")
+                .build();
+
+        Subcategory heladoLeche = Subcategory.builder()
+                .id(3)
+                .name("Helado base leche")
+                .build();
+
+        Subcategory chocolate = Subcategory.builder()
+                .id(4)
+                .name("Chocolate")
+                .build();
+
+        bebidas = Category.builder()
                 .id(1)
                 .name("Bebidas")
+                .subcategories(Collections.singletonList(aguaMineral))
                 .build();
 
-        iceCreams = Category.builder()
+        helados = Category.builder()
                 .id(2)
                 .name("Helados")
+                .subcategories(Collections.singletonList(heladoLeche))
                 .build();
 
-        snacks = Category.builder()
+        botanas = Category.builder()
                 .id(3)
                 .name("Botanas")
+                .subcategories(Collections.singletonList(papasFritas))
                 .build();
 
-        sweets = Category.builder()
+        dulces = Category.builder()
                 .id(4)
-                .name("Dulcería")
+                .name("Dulces")
+                .subcategories(Collections.singletonList(chocolate))
                 .build();
 
         // Guardar una nueva categoría
-        categorySaveRequestWines = CategorySaveRequestDto.builder()
+        categorySaveRequestVinos = CategorySaveRequestDto.builder()
                 .name("Vinos")
                 .build();
 
-        categoryToSaveWines = CategorySaveRequestDto.mapRequestDtoToEntity(categorySaveRequestWines);
+        categoryToSaveVinos = CategorySaveRequestDto.mapRequestDtoToEntity(categorySaveRequestVinos);
 
-        categorySavedWines = CategorySaveRequestDto.mapRequestDtoToEntity(5, categorySaveRequestWines);
+        categorySavedVinos = CategorySaveRequestDto.mapRequestDtoToEntity(5, categorySaveRequestVinos);
 
         // Actualizar una categoría existente
-        categoryUpdateRequestWines = CategorySaveRequestDto.builder()
+        categoryUpdateRequestVinos = CategorySaveRequestDto.builder()
                 .name("Vinos y Licores")
                 .build();
 
-        categoryToUpdateWines = CategorySaveRequestDto.mapRequestDtoToEntity(categoryUpdateRequestWines);
+        categoryToUpdateVinos = CategorySaveRequestDto.mapRequestDtoToEntity(categoryUpdateRequestVinos);
 
-        categoryUpdatedWines = CategorySaveRequestDto.mapRequestDtoToEntity(5, categoryUpdateRequestWines);
+        categoryUpdatedVinos = CategorySaveRequestDto.mapRequestDtoToEntity(5, categoryUpdateRequestVinos);
     }
 
     @Test
@@ -109,10 +135,10 @@ public class ICategoryServiceImplTest {
         String sortBy = "name";
 
         List<Category> categories = new ArrayList<>();
-        categories.add(drinks);
-        categories.add(snacks);
-        categories.add(sweets);
-        categories.add(iceCreams);
+        categories.add(bebidas);
+        categories.add(botanas);
+        categories.add(dulces);
+        categories.add(helados);
 
         Pageable pageable = PageRequest.ofSize(pageSize)
                 .withPage(pageNumber)
@@ -134,7 +160,7 @@ public class ICategoryServiceImplTest {
         assertThat(data.size()).isEqualTo(4);
         assertThat(data.get(0).getName()).isEqualTo("Bebidas");
         assertThat(data.get(1).getName()).isEqualTo("Botanas");
-        assertThat(data.get(2).getName()).isEqualTo("Dulcería");
+        assertThat(data.get(2).getName()).isEqualTo("Dulces");
         assertThat(data.get(3).getName()).isEqualTo("Helados");
 
         assertThat(meta.getPageNumber()).isZero();
@@ -183,7 +209,7 @@ public class ICategoryServiceImplTest {
         // Given
         Integer categoryId = 1;
 
-        given(categoryDao.findById(categoryId)).willReturn(Optional.of(drinks));
+        given(categoryDao.findById(categoryId)).willReturn(Optional.of(bebidas));
 
         // When
         CategoryGetResponseDto foundCategory = categoryService.findById(categoryId);
@@ -192,13 +218,14 @@ public class ICategoryServiceImplTest {
         assertThat(foundCategory).isNotNull();
         assertThat(foundCategory.getId()).isEqualTo(1);
         assertThat(foundCategory.getName()).isEqualTo("Bebidas");
+        assertThat(foundCategory.getSubcategories().get(0).getName()).isEqualTo("Agua mineral");
         assertThat(foundCategory.getDescription()).isEqualTo(null);
     }
 
     @Test
     public void findById_NonExistingCategory_Throw_DataNotFoundException() {
         // Given
-        Integer categoryId = 10;
+        Integer categoryId = 100;
 
         given(categoryDao.findById(anyInt())).willReturn(Optional.empty());
 
@@ -213,11 +240,11 @@ public class ICategoryServiceImplTest {
     @Test
     public void save_NonExistingCategory_Return_SavedCategory() {
         // Given
-        given(categoryDao.existsByName(categorySaveRequestWines.getName())).willReturn(false);
-        given(categoryDao.save(categoryToSaveWines)).willReturn(categorySavedWines);
+        given(categoryDao.existsByName(categorySaveRequestVinos.getName())).willReturn(false);
+        given(categoryDao.save(categoryToSaveVinos)).willReturn(categorySavedVinos);
 
         // When
-        CategorySaveResponseDto savedCategory = categoryService.save(categorySaveRequestWines);
+        CategorySaveResponseDto savedCategory = categoryService.save(categorySaveRequestVinos);
 
         // Then
         assertThat(savedCategory).isNotNull();
@@ -232,7 +259,7 @@ public class ICategoryServiceImplTest {
 
         // When
         Throwable thrown = assertThrows(DataAlreadyExistsException.class,
-                () -> categoryService.save(categorySaveRequestWines));
+                () -> categoryService.save(categorySaveRequestVinos));
 
         // Then
         MatcherAssert.assertThat(thrown.getMessage(), is("Category already exists!"));
@@ -243,11 +270,11 @@ public class ICategoryServiceImplTest {
         // Given
         Integer categoryId = 5;
 
-        given(categoryDao.findById(categoryId)).willReturn(Optional.ofNullable(categoryToUpdateWines));
-        given(categoryDao.save(categoryToUpdateWines)).willReturn(categoryUpdatedWines);
+        given(categoryDao.findById(categoryId)).willReturn(Optional.ofNullable(categoryToUpdateVinos));
+        given(categoryDao.save(categoryToUpdateVinos)).willReturn(categoryUpdatedVinos);
 
         // When
-        CategorySaveResponseDto updatedCategory = categoryService.update(categoryId, categoryUpdateRequestWines);
+        CategorySaveResponseDto updatedCategory = categoryService.update(categoryId, categoryUpdateRequestVinos);
 
         // Then
         assertThat(updatedCategory).isNotNull();
@@ -259,13 +286,13 @@ public class ICategoryServiceImplTest {
     @Test
     public void update_NonExistingCategory_Throw_DataNotFoundException() {
         // Given
-        Integer categoryId = 10;
+        Integer categoryId = 100;
 
         given(categoryDao.findById(categoryId)).willReturn(Optional.empty());
 
         // When
         Throwable thrown = assertThrows(DataNotFoundException.class,
-                () -> categoryService.update(categoryId, categoryUpdateRequestWines));
+                () -> categoryService.update(categoryId, categoryUpdateRequestVinos));
 
         // Then
         MatcherAssert.assertThat(thrown.getMessage(), is("Category does not exist!"));
@@ -274,7 +301,7 @@ public class ICategoryServiceImplTest {
     @Test
     public void deleteById_Category_NoReturn() {
         // Given
-        Integer categoryId = 1;
+        Integer categoryId = 10;
 
         willDoNothing().given(categoryDao).deleteById(anyInt());
 

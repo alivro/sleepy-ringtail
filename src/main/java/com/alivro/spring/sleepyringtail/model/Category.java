@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Table(name = "categories")
 @AllArgsConstructor
@@ -23,4 +25,7 @@ public class Category {
 
     @Column(name = "description", length = 150, nullable = true, unique = false)
     private String description;
+
+    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
+    private List<Subcategory> subcategories;
 }

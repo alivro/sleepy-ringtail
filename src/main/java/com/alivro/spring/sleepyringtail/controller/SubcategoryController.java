@@ -3,8 +3,7 @@ package com.alivro.spring.sleepyringtail.controller;
 import com.alivro.spring.sleepyringtail.handler.ResponseHandler;
 import com.alivro.spring.sleepyringtail.model.Subcategory;
 import com.alivro.spring.sleepyringtail.model.subcategory.request.SubcategorySaveRequestDto;
-import com.alivro.spring.sleepyringtail.model.subcategory.response.SubcategoryGetResponseDto;
-import com.alivro.spring.sleepyringtail.model.subcategory.response.SubcategorySaveResponseDto;
+import com.alivro.spring.sleepyringtail.model.subcategory.response.SubcategoryResponseDto;
 import com.alivro.spring.sleepyringtail.service.ISubcategoryService;
 import com.alivro.spring.sleepyringtail.util.pagination.CustomPageMetadata;
 import com.alivro.spring.sleepyringtail.util.pagination.CustomPaginationData;
@@ -43,10 +42,10 @@ public class SubcategoryController {
      * @return Información de todos las subcategorías
      */
     @GetMapping("/getAll")
-    public ResponseEntity<CustomResponse<SubcategoryGetResponseDto, CustomPageMetadata>> getAllSubcategories(
+    public ResponseEntity<CustomResponse<SubcategoryResponseDto, CustomPageMetadata>> getAllSubcategories(
             @PageableDefault(page = 0, size = 5, sort = "id", direction = Sort.Direction.ASC)
             Pageable pageable) {
-        CustomPaginationData<SubcategoryGetResponseDto, Subcategory> subcategoriesData = subcategoryService.findAll(pageable);
+        CustomPaginationData<SubcategoryResponseDto, Subcategory> subcategoriesData = subcategoryService.findAll(pageable);
 
         logger.info("Subcategorías encontradas.");
 
@@ -62,8 +61,8 @@ public class SubcategoryController {
      * @return Información de la subcategoría buscada
      */
     @GetMapping("/get/{id}")
-    public ResponseEntity<CustomResponse<SubcategoryGetResponseDto, Void>> getSubcategory(@PathVariable("id") Integer id) {
-        SubcategoryGetResponseDto foundSubcategory = subcategoryService.findById(id);
+    public ResponseEntity<CustomResponse<SubcategoryResponseDto, Void>> getSubcategory(@PathVariable("id") Integer id) {
+        SubcategoryResponseDto foundSubcategory = subcategoryService.findById(id);
 
         logger.info("Subcategoría encontrada. ID: {}", id);
 
@@ -75,13 +74,13 @@ public class SubcategoryController {
     /**
      * Endpoint para guardar una nueva subcategoría
      *
-     * @param subcategory Información de la subcategoría a guardar
+     * @param request Información de la subcategoría a guardar
      * @return Información de la subcategoría guardada
      */
     @PostMapping("/save")
-    public ResponseEntity<CustomResponse<SubcategorySaveResponseDto, Void>> saveCategory(
-            @Valid @RequestBody SubcategorySaveRequestDto subcategory) {
-        SubcategorySaveResponseDto savedSubcategory = subcategoryService.save(subcategory);
+    public ResponseEntity<CustomResponse<SubcategoryResponseDto, Void>> saveCategory(
+            @Valid @RequestBody SubcategorySaveRequestDto request) {
+        SubcategoryResponseDto savedSubcategory = subcategoryService.save(request);
 
         logger.info("Subcategoría guardada. ID: {}", savedSubcategory.getId());
 
@@ -93,14 +92,14 @@ public class SubcategoryController {
     /**
      * Endpoint para actualizar la información de una subcategoría
      *
-     * @param id          Identificador único de la subcategoría
-     * @param subcategory Información de la subcategoría a actualizar
+     * @param id      Identificador único de la subcategoría
+     * @param request Información de la subcategoría a actualizar
      * @return Información de la subcategoría actualizada
      */
     @PutMapping("/update/{id}")
-    public ResponseEntity<CustomResponse<SubcategorySaveResponseDto, Void>> updateSubcategory(
-            @PathVariable("id") Integer id, @Valid @RequestBody SubcategorySaveRequestDto subcategory) {
-        SubcategorySaveResponseDto updatedSubcategory = subcategoryService.update(id, subcategory);
+    public ResponseEntity<CustomResponse<SubcategoryResponseDto, Void>> updateSubcategory(
+            @PathVariable("id") Integer id, @Valid @RequestBody SubcategorySaveRequestDto request) {
+        SubcategoryResponseDto updatedSubcategory = subcategoryService.update(id, request);
 
         logger.info("Subcategoría actualizada. ID: {}", id);
 

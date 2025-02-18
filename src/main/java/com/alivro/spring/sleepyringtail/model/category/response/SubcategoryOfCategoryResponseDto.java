@@ -1,4 +1,4 @@
-package com.alivro.spring.sleepyringtail.model.subcategory.response;
+package com.alivro.spring.sleepyringtail.model.category.response;
 
 import com.alivro.spring.sleepyringtail.model.Subcategory;
 import lombok.AllArgsConstructor;
@@ -10,27 +10,23 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SubcategorySaveResponseDto {
+public class SubcategoryOfCategoryResponseDto {
     // Identificador único de la subcategoría
     private Integer id;
 
     // Nombre de la subcategoría
     private String name;
 
-    // Descripción de la subcategoría
-    private String description;
-
     /**
      * Convierte un objeto Entity en un objeto ResponseDto
      *
-     * @param subcategory Información de la subcategoría
+     * @param entity Información de la subcategoría
      * @return Representación ResponseDto de la información de la subcategoría
      */
-    public static SubcategorySaveResponseDto mapEntityToResponseDto(Subcategory subcategory) {
-        return SubcategorySaveResponseDto.builder()
-                .id(subcategory.getId())
-                .name(subcategory.getName())
-                .description(subcategory.getDescription())
+    public static SubcategoryOfCategoryResponseDto mapEntityToResponseDto(Subcategory entity) {
+        return SubcategoryOfCategoryResponseDto.builder()
+                .id(entity.getId())
+                .name(entity.getName())
                 .build();
     }
 }

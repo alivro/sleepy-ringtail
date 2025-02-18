@@ -23,4 +23,8 @@ public class Subcategory {
 
     @Column(name = "description", length = 150, nullable = true, unique = false)
     private String description;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false, unique = false)
+    private Category category;
 }

@@ -11,7 +11,7 @@ public interface ICategoryService {
     /**
      * Método para buscar todas las categorías
      *
-     * @return Información de todos las categorías
+     * @return Información de todas las categorías
      */
     CustomPaginationData<CategoryGetResponseDto, Category> findAll(Pageable pageable);
 
@@ -26,19 +26,19 @@ public interface ICategoryService {
     /**
      * Método para guardar una nueva categoría
      *
-     * @param category Información de la categoría a guardar
-     * @return Información de la categoría guardado
+     * @param request Información de la categoría a guardar
+     * @return Información de la categoría guardada
      */
-    CategorySaveResponseDto save(CategorySaveRequestDto category);
+    CategorySaveResponseDto save(CategorySaveRequestDto request);
 
     /**
      * Método para actualizar la información de una categoría
      *
-     * @param id       Identificador único de la categoría
-     * @param category Información de la categoría  a actualizar
-     * @return Información de la categoría actualizado
+     * @param id      Identificador único de la categoría
+     * @param request Información de la categoría a actualizar
+     * @return Información de la categoría actualizada
      */
-    CategorySaveResponseDto update(Integer id, CategorySaveRequestDto category);
+    CategorySaveResponseDto update(Integer id, CategorySaveRequestDto request);
 
     /**
      * Método para eliminar una categoría por su ID

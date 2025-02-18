@@ -48,7 +48,7 @@ public class CategoryController {
             Pageable pageable) {
         CustomPaginationData<CategoryGetResponseDto, Category> categoriesData = categoryService.findAll(pageable);
 
-        logger.info("Categorías encontrados.");
+        logger.info("Categorías encontradas.");
 
         return ResponseHandler.sendResponse(
                 HttpStatus.OK, "Found categories!", categoriesData.getData(), categoriesData.getMetadata()
@@ -75,13 +75,13 @@ public class CategoryController {
     /**
      * Endpoint para guardar una nueva categoría
      *
-     * @param category Información de la categoría a guardar
+     * @param request Información de la categoría a guardar
      * @return Información de la categoría guardada
      */
     @PostMapping("/save")
     public ResponseEntity<CustomResponse<CategorySaveResponseDto, Void>> saveCategory(
-            @Valid @RequestBody CategorySaveRequestDto category) {
-        CategorySaveResponseDto savedCategory = categoryService.save(category);
+            @Valid @RequestBody CategorySaveRequestDto request) {
+        CategorySaveResponseDto savedCategory = categoryService.save(request);
 
         logger.info("Categoría guardada. ID: {}", savedCategory.getId());
 
@@ -93,14 +93,14 @@ public class CategoryController {
     /**
      * Endpoint para actualizar la información de una categoría
      *
-     * @param id       Identificador único de la categoría
-     * @param category Información de la categoría a actualizar
+     * @param id      Identificador único de la categoría
+     * @param request Información de la categoría a actualizar
      * @return Información de la categoría actualizada
      */
     @PutMapping("/update/{id}")
     public ResponseEntity<CustomResponse<CategorySaveResponseDto, Void>> updateCategory(
-            @PathVariable("id") Integer id, @Valid @RequestBody CategorySaveRequestDto category) {
-        CategorySaveResponseDto updatedCategory = categoryService.update(id, category);
+            @PathVariable("id") Integer id, @Valid @RequestBody CategorySaveRequestDto request) {
+        CategorySaveResponseDto updatedCategory = categoryService.update(id, request);
 
         logger.info("Categoría actualizada. ID: {}", id);
 

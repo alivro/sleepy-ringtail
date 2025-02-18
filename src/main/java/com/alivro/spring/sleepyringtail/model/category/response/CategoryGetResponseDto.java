@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,17 +23,25 @@ public class CategoryGetResponseDto {
     // Descripción de la categoría
     private String description;
 
+    // Subcategoría(s) de la categoría
+    private List<SubcategoryOfCategoryResponseDto> subcategories;
+
     /**
      * Convierte un objeto Entity en un objeto ResponseDto
      *
-     * @param category Información de la categoría
+     * @param entity Información de la categoría
      * @return Representación ResponseDto de la información de la categoría
      */
-    public static CategoryGetResponseDto mapEntityToResponseDto(Category category) {
+    public static CategoryGetResponseDto mapEntityToResponseDto(Category entity) {
+        List<SubcategoryOfCategoryResponseDto> subcategoriesOfCategory = entity.getSubcategories().stream()
+                .map(SubcategoryOfCategoryResponseDto::mapEntityToResponseDto)
+                .collect(Collectors.toList());
+
         return CategoryGetResponseDto.builder()
-                .id(category.getId())
-                .name(category.getName())
-                .description(category.getDescription())
+                .id(entity.getId())
+                .name(entity.getName())
+                .description(entity.getDescription())
+                .subcategories(subcategoriesOfCategory)
                 .build();
     }
 }

@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SubcategoryGetResponseDto {
+public class SubcategoryResponseDto {
     // Identificador único de la subcategoría
     private Integer id;
 
@@ -20,17 +20,24 @@ public class SubcategoryGetResponseDto {
     // Descripción de la subcategoría
     private String description;
 
+    // Categoría de la subcategoría
+    private CategoryOfSubcategoryResponseDto category;
+
     /**
      * Convierte un objeto Entity en un objeto ResponseDto
      *
-     * @param subcategory Información de la subcategoría
+     * @param entity Información de la subcategoría
      * @return Representación ResponseDto de la información de la subcategoría
      */
-    public static SubcategoryGetResponseDto mapEntityToResponseDto(Subcategory subcategory) {
-        return SubcategoryGetResponseDto.builder()
-                .id(subcategory.getId())
-                .name(subcategory.getName())
-                .description(subcategory.getDescription())
+    public static SubcategoryResponseDto mapEntityToResponseDto(Subcategory entity) {
+        CategoryOfSubcategoryResponseDto categoryOfSubcategory =
+                CategoryOfSubcategoryResponseDto.mapEntityToResponseDto(entity.getCategory());
+
+        return SubcategoryResponseDto.builder()
+                .id(entity.getId())
+                .name(entity.getName())
+                .description(entity.getDescription())
+                .category(categoryOfSubcategory)
                 .build();
     }
 }

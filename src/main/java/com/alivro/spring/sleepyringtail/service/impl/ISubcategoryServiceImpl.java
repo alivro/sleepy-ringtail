@@ -54,6 +54,27 @@ public class ISubcategoryServiceImpl implements ISubcategoryService {
     }
 
     /**
+     * Método para buscar las subcategorías que contengan una palabra dada
+     *
+     * @param word     Palabra a buscar en el nombre de la subcategoría
+     * @param pageable Información de paginación
+     * @return Información de las subcategorías que cumplen con el criterio de búsqueda
+     */
+    @Override
+    public CustomPaginationData<SubcategoryResponseDto, Subcategory> findAllByName(String word, Pageable pageable) {
+        logger.info("Busca todas las subcategorías.");
+
+        Page<Subcategory> subcategoriesPage = subcategoryDao.findByNameContainingIgnoreCase(word, pageable);
+
+        // Información de las categorías
+        List<SubcategoryResponseDto> foundSubcategories = subcategoriesPage.stream()
+                .map(SubcategoryResponseDto::mapEntityToResponseDto)
+                .toList();
+
+        return new CustomPaginationData<>(foundSubcategories, subcategoriesPage);
+    }
+
+    /**
      * Método para buscar una subcategoría por su ID
      *
      * @param id Identificador único de la subcategoría

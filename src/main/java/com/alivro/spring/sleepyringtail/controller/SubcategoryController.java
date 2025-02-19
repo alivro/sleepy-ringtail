@@ -55,6 +55,28 @@ public class SubcategoryController {
     }
 
     /**
+     * Endpoint para buscar todas las subcategorías que contengan una palabra dada
+     *
+     * @param word     Palabra a buscar en el nombre de la subcategoría
+     * @param pageable Información de paginación
+     * @return Información de todas las subcategorías que cumplen con el criterio de búsqueda
+     */
+    @GetMapping("/getAllByName/{word}")
+    public ResponseEntity<CustomResponse<SubcategoryResponseDto, CustomPageMetadata>> getAllSubcategoriesByName(
+            @PathVariable("word") String word,
+            @PageableDefault(page = 0, size = 5, sort = "id", direction = Sort.Direction.ASC)
+            Pageable pageable) {
+        CustomPaginationData<SubcategoryResponseDto, Subcategory> subcategoriesData =
+                subcategoryService.findAllByName(word, pageable);
+
+        logger.info("Subcategorías encontradas.");
+
+        return ResponseHandler.sendResponse(
+                HttpStatus.OK, "Found subcategories!", subcategoriesData.getData(), subcategoriesData.getMetadata()
+        );
+    }
+
+    /**
      * Endpoint para buscar una subcategoría por su ID
      *
      * @param id Identificador único de la subcategoría
@@ -78,7 +100,7 @@ public class SubcategoryController {
      * @return Información de la subcategoría guardada
      */
     @PostMapping("/save")
-    public ResponseEntity<CustomResponse<SubcategoryResponseDto, Void>> saveCategory(
+    public ResponseEntity<CustomResponse<SubcategoryResponseDto, Void>> saveSubcategory(
             @Valid @RequestBody SubcategorySaveRequestDto request) {
         SubcategoryResponseDto savedSubcategory = subcategoryService.save(request);
 

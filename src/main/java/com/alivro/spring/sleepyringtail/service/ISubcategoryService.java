@@ -15,6 +15,15 @@ public interface ISubcategoryService {
     CustomPaginationData<SubcategoryResponseDto, Subcategory> findAll(Pageable pageable);
 
     /**
+     * Método para buscar las subcategorías que contengan una palabra dada
+     *
+     * @param word     Palabra a buscar en el nombre de la subcategoría
+     * @param pageable Información de paginación
+     * @return Información de las subcategorías que cumplen con el criterio de búsqueda
+     */
+    CustomPaginationData<SubcategoryResponseDto, Subcategory> findAllByName(String word, Pageable pageable);
+
+    /**
      * Método para buscar una subcategoría por su ID
      *
      * @param id Identificador único de la subcategoría

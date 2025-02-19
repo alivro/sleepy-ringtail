@@ -32,8 +32,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -56,9 +55,9 @@ public class CategoryControllerTest {
 
     // Buscar todas las categorías
     private static CategoryGetResponseDto categoryResponseBebidas;
-    private static CategoryGetResponseDto categoryResponseHelados;
     private static CategoryGetResponseDto categoryResponseBotanas;
     private static CategoryGetResponseDto categoryResponseDulces;
+    private static CategoryGetResponseDto categoryResponseHelados;
 
     // Guardar una nueva categoría
     private static CategorySaveRequestDto categorySaveRequestVinos;
@@ -71,14 +70,14 @@ public class CategoryControllerTest {
     @BeforeAll
     public static void setup() {
         // Buscar todas las categorías
-        SubcategoryOfCategoryResponseDto papasFritas = SubcategoryOfCategoryResponseDto.builder()
+                SubcategoryOfCategoryResponseDto aguaMineral = SubcategoryOfCategoryResponseDto.builder()
                 .id(1)
-                .name("Papas fritas")
+                .name("Agua mineral")
                 .build();
 
-        SubcategoryOfCategoryResponseDto aguaMineral = SubcategoryOfCategoryResponseDto.builder()
+        SubcategoryOfCategoryResponseDto chocolate = SubcategoryOfCategoryResponseDto.builder()
                 .id(2)
-                .name("Agua mineral")
+                .name("Chocolate")
                 .build();
 
         SubcategoryOfCategoryResponseDto heladoLeche = SubcategoryOfCategoryResponseDto.builder()
@@ -86,9 +85,9 @@ public class CategoryControllerTest {
                 .name("Helado base leche")
                 .build();
 
-        SubcategoryOfCategoryResponseDto chocolate = SubcategoryOfCategoryResponseDto.builder()
+        SubcategoryOfCategoryResponseDto papasFritas = SubcategoryOfCategoryResponseDto.builder()
                 .id(4)
-                .name("Chocolate")
+                .name("Papas fritas")
                 .build();
 
         categoryResponseBebidas = CategoryGetResponseDto.builder()
@@ -97,22 +96,22 @@ public class CategoryControllerTest {
                 .subcategories(Collections.singletonList(aguaMineral))
                 .build();
 
-        categoryResponseHelados = CategoryGetResponseDto.builder()
-                .id(2)
-                .name("Helados")
-                .subcategories(Collections.singletonList(heladoLeche))
-                .build();
-
         categoryResponseBotanas = CategoryGetResponseDto.builder()
-                .id(3)
+                .id(2)
                 .name("Botanas")
                 .subcategories(Collections.singletonList(papasFritas))
                 .build();
 
         categoryResponseDulces = CategoryGetResponseDto.builder()
-                .id(4)
+                .id(3)
                 .name("Dulces")
                 .subcategories(Collections.singletonList(chocolate))
+                .build();
+
+        categoryResponseHelados = CategoryGetResponseDto.builder()
+                .id(4)
+                .name("Helados")
+                .subcategories(Collections.singletonList(heladoLeche))
                 .build();
 
         // Guardar una nueva categoría
@@ -131,7 +130,7 @@ public class CategoryControllerTest {
     }
 
     @Test
-    public void findAllByNameAsc_ExistingCategories_Return_IsOk() throws Exception {
+    public void getAll_OrderByNameAsc_ExistingCategories_Return_IsOk() throws Exception {
         //Given
         int pageNumber = 0;
         int pageSize = 5;
@@ -175,28 +174,28 @@ public class CategoryControllerTest {
 
         response.andExpect(MockMvcResultMatchers.jsonPath("$.data", hasSize(4)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].name",
-                        CoreMatchers.is(categoryResponseBebidas.getName())))
+                        CoreMatchers.is("Bebidas")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[1].name",
-                        CoreMatchers.is(categoryResponseBotanas.getName())))
+                        CoreMatchers.is("Botanas")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[2].name",
-                        CoreMatchers.is(categoryResponseDulces.getName())))
+                        CoreMatchers.is("Dulces")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[3].name",
-                        CoreMatchers.is(categoryResponseHelados.getName())));
+                        CoreMatchers.is("Helados")));
 
         response.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pageNumber",
-                        CoreMatchers.is(pageNumber)))
+                        CoreMatchers.is(0)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pageSize",
-                        CoreMatchers.is(pageSize)))
+                        CoreMatchers.is(5)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.metadata.numberOfElements",
-                        CoreMatchers.is(foundCategories.size())))
+                        CoreMatchers.is(4)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.metadata.totalPages",
                         CoreMatchers.is(1)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.metadata.totalElements",
-                        CoreMatchers.is(foundCategories.size())));
+                        CoreMatchers.is(4)));
     }
 
     @Test
-    public void findAll_NoExistingCategories_Return_IsOk() throws Exception {
+    public void getAll_NoExistingCategories_Return_IsOk() throws Exception {
         //Given
         int pageNumber = 0;
         int pageSize = 5;
@@ -233,15 +232,125 @@ public class CategoryControllerTest {
         response.andExpect(MockMvcResultMatchers.jsonPath("$.data", hasSize(0)));
 
         response.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pageNumber",
-                        CoreMatchers.is(pageNumber)))
+                        CoreMatchers.is(0)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pageSize",
-                        CoreMatchers.is(pageSize)))
+                        CoreMatchers.is(5)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.metadata.numberOfElements",
-                        CoreMatchers.is(foundCategories.size())))
+                        CoreMatchers.is(0)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.metadata.totalPages",
                         CoreMatchers.is(0)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.metadata.totalElements",
-                        CoreMatchers.is(foundCategories.size())));
+                        CoreMatchers.is(0)));
+    }
+
+    @Test
+    public void getAllByName_OrderByNameAsc_ExistingCategories_Return_IsOk() throws Exception {
+        //Given
+        String word = "as";
+        int pageNumber = 0;
+        int pageSize = 5;
+        String sortBy = "name";
+        Pageable pageable = PageRequest.ofSize(pageSize)
+                .withPage(pageNumber)
+                .withSort(Sort.by(sortBy).ascending());
+
+        List<CategoryGetResponseDto> foundCategories = new ArrayList<>();
+        foundCategories.add(categoryResponseBebidas);
+        foundCategories.add(categoryResponseBotanas);
+
+        CustomPageMetadata metadata = CustomPageMetadata.builder()
+                .pageNumber(pageNumber)
+                .pageSize(pageSize)
+                .numberOfElements(foundCategories.size())
+                .totalPages((int) Math.ceil((double) foundCategories.size() / pageSize))
+                .totalElements(foundCategories.size())
+                .build();
+
+        given(categoryService.findAllByName(word, pageable)).willReturn(
+                CustomPaginationData.<CategoryGetResponseDto, Category>builder()
+                        .data(foundCategories)
+                        .metadata(metadata)
+                        .build()
+        );
+
+        // When
+        ResultActions response = mockMvc.perform(get(url + "/getAllByName/{word}", "as")
+                .param("page", "0")
+                .param("size", "5")
+                .param("sort", "name,asc")
+        );
+
+        // Then
+        response.andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                        CoreMatchers.is("Found categories!")));
+
+        response.andExpect(MockMvcResultMatchers.jsonPath("$.data", hasSize(2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].name",
+                        CoreMatchers.is("Bebidas")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[1].name",
+                        CoreMatchers.is("Botanas")));
+
+        response.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pageNumber",
+                        CoreMatchers.is(0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pageSize",
+                        CoreMatchers.is(5)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.metadata.numberOfElements",
+                        CoreMatchers.is(2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.metadata.totalPages",
+                        CoreMatchers.is(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.metadata.totalElements",
+                        CoreMatchers.is(2)));
+    }
+
+    @Test
+    public void getAllByName_NoExistingCategories_Return_IsOk() throws Exception {
+        //Given
+        String word = "us";
+        int pageNumber = 0;
+        int pageSize = 5;
+        String sortBy = "id";
+        Pageable pageable = PageRequest.ofSize(pageSize)
+                .withPage(pageNumber)
+                .withSort(Sort.by(sortBy).ascending());
+
+        List<CategoryGetResponseDto> foundCategories = new ArrayList<>();
+
+        CustomPageMetadata metadata = CustomPageMetadata.builder()
+                .pageNumber(pageNumber)
+                .pageSize(pageSize)
+                .numberOfElements(0)
+                .totalPages(0)
+                .totalElements(0)
+                .build();
+
+        given(categoryService.findAllByName(word, pageable)).willReturn(
+                CustomPaginationData.<CategoryGetResponseDto, Category>builder()
+                        .data(foundCategories)
+                        .metadata(metadata)
+                        .build()
+        );
+
+        // When
+        ResultActions response = mockMvc.perform(get(url + "/getAllByName/{word}", "us"));
+
+        // Then
+        response.andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                        CoreMatchers.is("Found categories!")));
+
+        response.andExpect(MockMvcResultMatchers.jsonPath("$.data", hasSize(0)));
+
+        response.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pageNumber",
+                        CoreMatchers.is(0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pageSize",
+                        CoreMatchers.is(5)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.metadata.numberOfElements",
+                        CoreMatchers.is(0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.metadata.totalPages",
+                        CoreMatchers.is(0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.metadata.totalElements",
+                        CoreMatchers.is(0)));
     }
 
     @Test
@@ -252,7 +361,7 @@ public class CategoryControllerTest {
         given(categoryService.findById(categoryId)).willReturn(categoryResponseBebidas);
 
         // When
-        ResultActions response = mockMvc.perform(get(url + "/get/{id}", categoryId));
+        ResultActions response = mockMvc.perform(get(url + "/get/{id}", 1));
 
         // Then
         response.andExpect(MockMvcResultMatchers.status().isOk())
@@ -260,23 +369,21 @@ public class CategoryControllerTest {
                         CoreMatchers.is("Found category!")));
 
         response.andExpect(MockMvcResultMatchers.jsonPath("$.data[0].id")
-                        .value(categoryResponseBebidas.getId()))
+                        .value(1))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].name",
-                        CoreMatchers.is(categoryResponseBebidas.getName())))
+                        CoreMatchers.is("Bebidas")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].subcategories[0].name",
-                        CoreMatchers.is(categoryResponseBebidas.getSubcategories().get(0).getName())));
+                        CoreMatchers.is("Agua mineral")));
     }
 
     @Test
     public void findById_NonExistingCategory_Return_IsNotFound() throws Exception {
         //Given
-        Integer categoryId = 100;
-
-        given(categoryService.findById(categoryId))
+        given(categoryService.findById(anyInt()))
                 .willThrow(new DataNotFoundException("Category not found!"));
 
         // When
-        ResultActions response = mockMvc.perform(get(url + "/get/{id}", categoryId));
+        ResultActions response = mockMvc.perform(get(url + "/get/{id}", 100));
 
         // Then
         response.andExpect(MockMvcResultMatchers.status().isNotFound())
@@ -286,11 +393,8 @@ public class CategoryControllerTest {
 
     @Test
     public void findById_StringId_Return_IsInternalServerError() throws Exception {
-        //Given
-        String categoryId = "one";
-
         // When
-        ResultActions response = mockMvc.perform(get(url + "/get/{id}", categoryId));
+        ResultActions response = mockMvc.perform(get(url + "/get/{id}", "one"));
 
         // Then
         response.andExpect(MockMvcResultMatchers.status().isInternalServerError());
@@ -313,7 +417,7 @@ public class CategoryControllerTest {
                         CoreMatchers.is("Saved category!")));
 
         response.andExpect(MockMvcResultMatchers.jsonPath("$.data[0].name",
-                CoreMatchers.is(categorySavedResponseVinos.getName())));
+                CoreMatchers.is("Vinos")));
     }
 
     @Test
@@ -342,7 +446,7 @@ public class CategoryControllerTest {
                 .willReturn(categoryUpdatedResponseVinos);
 
         // When
-        ResultActions response = mockMvc.perform(put(url + "/update/{id}", categoryId)
+        ResultActions response = mockMvc.perform(put(url + "/update/{id}", 5)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(categoryUpdateRequestVinos)));
 
@@ -352,19 +456,17 @@ public class CategoryControllerTest {
                         CoreMatchers.is("Updated category!")));
 
         response.andExpect(MockMvcResultMatchers.jsonPath("$.data[0].name",
-                CoreMatchers.is(categoryUpdatedResponseVinos.getName())));
+                CoreMatchers.is("Vinos y Licores")));
     }
 
     @Test
     public void update_NonExistingCategory_Return_IsNotFound() throws Exception {
         // Given
-        Integer categoryId = 10;
-
         given(categoryService.update(anyInt(), any(CategorySaveRequestDto.class)))
                 .willThrow(new DataNotFoundException("Category does not exist!"));
 
         // When
-        ResultActions response = mockMvc.perform(put(url + "/update/{id}", categoryId)
+        ResultActions response = mockMvc.perform(put(url + "/update/{id}", 100)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(categoryUpdateRequestVinos)));
 
@@ -377,12 +479,10 @@ public class CategoryControllerTest {
     @Test
     public void deleteById_Category_Return_IsOk() throws Exception {
         // Given
-        Integer categoryId = 10;
-
         willDoNothing().given(categoryService).deleteById(anyInt());
 
         // When
-        ResultActions response = mockMvc.perform(delete(url + "/delete/{id}", categoryId));
+        ResultActions response = mockMvc.perform(delete(url + "/delete/{id}", 10));
 
         // Then
         response.andExpect(MockMvcResultMatchers.status().isOk())

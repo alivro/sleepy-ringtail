@@ -47,9 +47,9 @@ public class ICategoryServiceImplTest {
 
     // Buscar todas las categorías
     private static Category bebidas;
-    private static Category helados;
     private static Category botanas;
     private static Category dulces;
+    private static Category helados;
 
     // Guardar una nueva categoría
     private static CategorySaveRequestDto categorySaveRequestVinos;
@@ -64,14 +64,14 @@ public class ICategoryServiceImplTest {
     @BeforeAll
     public static void setup() {
         // Buscar todas las categorías
-        Subcategory papasFritas = Subcategory.builder()
+        Subcategory aguaMineral = Subcategory.builder()
                 .id(1)
-                .name("Papas fritas")
+                .name("Agua mineral")
                 .build();
 
-        Subcategory aguaMineral = Subcategory.builder()
+        Subcategory chocolate = Subcategory.builder()
                 .id(2)
-                .name("Agua mineral")
+                .name("Chocolate")
                 .build();
 
         Subcategory heladoLeche = Subcategory.builder()
@@ -79,9 +79,9 @@ public class ICategoryServiceImplTest {
                 .name("Helado base leche")
                 .build();
 
-        Subcategory chocolate = Subcategory.builder()
+        Subcategory papasFritas = Subcategory.builder()
                 .id(4)
-                .name("Chocolate")
+                .name("Papas fritas")
                 .build();
 
         bebidas = Category.builder()
@@ -90,22 +90,22 @@ public class ICategoryServiceImplTest {
                 .subcategories(Collections.singletonList(aguaMineral))
                 .build();
 
-        helados = Category.builder()
-                .id(2)
-                .name("Helados")
-                .subcategories(Collections.singletonList(heladoLeche))
-                .build();
-
         botanas = Category.builder()
-                .id(3)
+                .id(2)
                 .name("Botanas")
                 .subcategories(Collections.singletonList(papasFritas))
                 .build();
 
         dulces = Category.builder()
-                .id(4)
+                .id(3)
                 .name("Dulces")
                 .subcategories(Collections.singletonList(chocolate))
+                .build();
+
+        helados = Category.builder()
+                .id(4)
+                .name("Helados")
+                .subcategories(Collections.singletonList(heladoLeche))
                 .build();
 
         // Guardar una nueva categoría
@@ -128,7 +128,7 @@ public class ICategoryServiceImplTest {
     }
 
     @Test
-    public void findAllByNameAsc_ExistingCategories_Return_ListOfCategories() {
+    public void findAll_OrderByNameAsc_ExistingCategories_Return_ListOfCategories() {
         // Given
         int pageNumber = 0;
         int pageSize = 5;
@@ -205,6 +205,83 @@ public class ICategoryServiceImplTest {
     }
 
     @Test
+    public void findAllByName_OrderByNameAsc_ExistingCategories_Return_ListOfCategories() {
+        // Given
+        String word = "as";
+        int pageNumber = 0;
+        int pageSize = 5;
+        String sortBy = "name";
+
+        List<Category> categories = new ArrayList<>();
+        categories.add(bebidas);
+        categories.add(botanas);
+
+        Pageable pageable = PageRequest.ofSize(pageSize)
+                .withPage(pageNumber)
+                .withSort(Sort.by(sortBy).ascending());
+
+        given(categoryDao.findByNameContainingIgnoreCase(word, pageable)).willReturn(
+                new PageImpl<>(categories, pageable, categories.size())
+        );
+
+        // When
+        CustomPaginationData<CategoryGetResponseDto, Category> categoriesData = categoryService.findAllByName(
+                "as",
+                PageRequest.of(0, 5, Sort.by("name").ascending())
+        );
+
+        // Then
+        List<CategoryGetResponseDto> data = categoriesData.getData();
+        CustomPageMetadata meta = categoriesData.getMetadata();
+
+        assertThat(data.size()).isEqualTo(2);
+        assertThat(data.get(0).getName()).isEqualTo("Bebidas");
+        assertThat(data.get(1).getName()).isEqualTo("Botanas");
+
+        assertThat(meta.getPageNumber()).isZero();
+        assertThat(meta.getPageSize()).isEqualTo(5);
+        assertThat(meta.getNumberOfElements()).isEqualTo(2);
+        assertThat(meta.getTotalElements()).isEqualTo(2);
+        assertThat(meta.getTotalPages()).isEqualTo(1);
+    }
+
+    @Test
+    public void findAllByName_NonExistingCategories_Return_EmptyListOfCategories() {
+        String word = "us";
+        int pageNumber = 0;
+        int pageSize = 5;
+        String sortBy = "id";
+
+        List<Category> categories = new ArrayList<>();
+
+        Pageable pageable = PageRequest.ofSize(pageSize)
+                .withPage(pageNumber)
+                .withSort(Sort.by(sortBy).ascending());
+
+        given(categoryDao.findByNameContainingIgnoreCase(word, pageable)).willReturn(
+                new PageImpl<>(categories, pageable, 0)
+        );
+
+        // When
+        CustomPaginationData<CategoryGetResponseDto, Category> categoriesData = categoryService.findAllByName(
+                "us",
+                PageRequest.of(0, 5, Sort.by("id").ascending())
+        );
+
+        // Then
+        List<CategoryGetResponseDto> data = categoriesData.getData();
+        CustomPageMetadata meta = categoriesData.getMetadata();
+
+        assertThat(data.size()).isEqualTo(0);
+
+        assertThat(meta.getPageNumber()).isEqualTo(0);
+        assertThat(meta.getPageSize()).isEqualTo(5);
+        assertThat(meta.getNumberOfElements()).isEqualTo(0);
+        assertThat(meta.getTotalElements()).isEqualTo(0);
+        assertThat(meta.getTotalPages()).isEqualTo(0);
+    }
+
+    @Test
     public void findById_ExistingCategory_Return_FoundCategory() {
         // Given
         Integer categoryId = 1;
@@ -212,7 +289,7 @@ public class ICategoryServiceImplTest {
         given(categoryDao.findById(categoryId)).willReturn(Optional.of(bebidas));
 
         // When
-        CategoryGetResponseDto foundCategory = categoryService.findById(categoryId);
+        CategoryGetResponseDto foundCategory = categoryService.findById(1);
 
         // Then
         assertThat(foundCategory).isNotNull();
@@ -225,13 +302,11 @@ public class ICategoryServiceImplTest {
     @Test
     public void findById_NonExistingCategory_Throw_DataNotFoundException() {
         // Given
-        Integer categoryId = 100;
-
         given(categoryDao.findById(anyInt())).willReturn(Optional.empty());
 
         // When
         Throwable thrown = assertThrows(DataNotFoundException.class,
-                () -> categoryService.findById(categoryId));
+                () -> categoryService.findById(100));
 
         // Then
         MatcherAssert.assertThat(thrown.getMessage(), is("Category not found!"));
@@ -274,7 +349,7 @@ public class ICategoryServiceImplTest {
         given(categoryDao.save(categoryToUpdateVinos)).willReturn(categoryUpdatedVinos);
 
         // When
-        CategorySaveResponseDto updatedCategory = categoryService.update(categoryId, categoryUpdateRequestVinos);
+        CategorySaveResponseDto updatedCategory = categoryService.update(5, categoryUpdateRequestVinos);
 
         // Then
         assertThat(updatedCategory).isNotNull();
@@ -286,13 +361,11 @@ public class ICategoryServiceImplTest {
     @Test
     public void update_NonExistingCategory_Throw_DataNotFoundException() {
         // Given
-        Integer categoryId = 100;
-
-        given(categoryDao.findById(categoryId)).willReturn(Optional.empty());
+        given(categoryDao.findById(anyInt())).willReturn(Optional.empty());
 
         // When
         Throwable thrown = assertThrows(DataNotFoundException.class,
-                () -> categoryService.update(categoryId, categoryUpdateRequestVinos));
+                () -> categoryService.update(100, categoryUpdateRequestVinos));
 
         // Then
         MatcherAssert.assertThat(thrown.getMessage(), is("Category does not exist!"));
@@ -301,14 +374,12 @@ public class ICategoryServiceImplTest {
     @Test
     public void deleteById_Category_NoReturn() {
         // Given
-        Integer categoryId = 10;
-
         willDoNothing().given(categoryDao).deleteById(anyInt());
 
         // When
-        categoryService.deleteById(categoryId);
+        categoryService.deleteById(10);
 
         // Then
-        verify(categoryDao, times(1)).deleteById(categoryId);
+        verify(categoryDao, times(1)).deleteById(10);
     }
 }

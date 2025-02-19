@@ -11,9 +11,19 @@ public interface ICategoryService {
     /**
      * Método para buscar todas las categorías
      *
+     * @param pageable Información de paginación
      * @return Información de todas las categorías
      */
     CustomPaginationData<CategoryGetResponseDto, Category> findAll(Pageable pageable);
+
+    /**
+     * Método para buscar las categorías que contengan una palabra dada
+     *
+     * @param word     Palabra a buscar en el nombre de la categoría
+     * @param pageable Información de paginación
+     * @return Información de las categorías que cumplen con el criterio de búsqueda
+     */
+    CustomPaginationData<CategoryGetResponseDto, Category> findAllByName(String word, Pageable pageable);
 
     /**
      * Método para buscar una categoría por su ID

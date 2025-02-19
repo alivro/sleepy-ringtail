@@ -40,13 +40,34 @@ public class CategoryController {
     /**
      * Endpoint para buscar todas las categorías
      *
-     * @return Información de todos las categorías
+     * @return Información de todas las categorías
      */
     @GetMapping("/getAll")
     public ResponseEntity<CustomResponse<CategoryGetResponseDto, CustomPageMetadata>> getAllCategories(
             @PageableDefault(page = 0, size = 5, sort = "id", direction = Sort.Direction.ASC)
             Pageable pageable) {
         CustomPaginationData<CategoryGetResponseDto, Category> categoriesData = categoryService.findAll(pageable);
+
+        logger.info("Categorías encontradas.");
+
+        return ResponseHandler.sendResponse(
+                HttpStatus.OK, "Found categories!", categoriesData.getData(), categoriesData.getMetadata()
+        );
+    }
+
+    /**
+     * Endpoint para buscar todas las categorías que contengan una palabra dada
+     *
+     * @param word     Palabra a buscar en el nombre de la categoría
+     * @param pageable Información de paginación
+     * @return Información de todas las categorías que cumplen con el criterio de búsqueda
+     */
+    @GetMapping("/getAllByName/{word}")
+    public ResponseEntity<CustomResponse<CategoryGetResponseDto, CustomPageMetadata>> getAllCategoriesByName(
+            @PathVariable("word") String word,
+            @PageableDefault(page = 0, size = 5, sort = "id", direction = Sort.Direction.ASC)
+            Pageable pageable) {
+        CustomPaginationData<CategoryGetResponseDto, Category> categoriesData = categoryService.findAllByName(word, pageable);
 
         logger.info("Categorías encontradas.");
 

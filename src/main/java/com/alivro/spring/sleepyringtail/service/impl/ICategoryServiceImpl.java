@@ -37,6 +37,7 @@ public class ICategoryServiceImpl implements ICategoryService {
     /**
      * Método para buscar todas las categorías
      *
+     * @param pageable Información de paginación
      * @return Información de todas las categorías
      */
     @Override
@@ -44,6 +45,27 @@ public class ICategoryServiceImpl implements ICategoryService {
         logger.info("Busca todas las categorías.");
 
         Page<Category> categoriesPage = categoryDao.findAll(pageable);
+
+        // Información de las categorías
+        List<CategoryGetResponseDto> foundCategories = categoriesPage.stream()
+                .map(CategoryGetResponseDto::mapEntityToResponseDto)
+                .toList();
+
+        return new CustomPaginationData<>(foundCategories, categoriesPage);
+    }
+
+    /**
+     * Método para buscar las categorías que contengan una palabra dada
+     *
+     * @param word     Palabra a buscar en el nombre de la categoría
+     * @param pageable Información de paginación
+     * @return Información de las categorías que cumplen con el criterio de búsqueda
+     */
+    @Override
+    public CustomPaginationData<CategoryGetResponseDto, Category> findAllByName(String word, Pageable pageable) {
+        logger.info("Busca todas las categorías.");
+
+        Page<Category> categoriesPage = categoryDao.findByNameContainingIgnoreCase(word, pageable);
 
         // Información de las categorías
         List<CategoryGetResponseDto> foundCategories = categoriesPage.stream()

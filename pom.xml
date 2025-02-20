@@ -11,7 +11,7 @@
 
     <groupId>com.alivro.spring</groupId>
     <artifactId>sleepyringtail</artifactId>
-    <version>0.0.3</version>
+    <version>0.1.0</version>
     <name>Sleepy Ringtail</name>
     <description>Stores the Sleepy Ringtail</description>
     <packaging>jar</packaging>

@@ -45,10 +45,10 @@ public class ISubcategoryServiceImplTest {
     private ISubcategoryServiceImpl subcategoryService;
 
     // Buscar todas las subcategorías
-    private static Subcategory papasFritas;
     private static Subcategory aguaMineral;
-    private static Subcategory heladoLeche;
     private static Subcategory chocolate;
+    private static Subcategory heladoLeche;
+    private static Subcategory papasFritas;
 
     // Guardar una nueva subcategoría
     private static SubcategorySaveRequestDto subcategorySaveRequestGomitas;
@@ -68,31 +68,31 @@ public class ISubcategoryServiceImplTest {
                 .name("Bebidas")
                 .build();
 
-        Category helados = Category.builder()
-                .id(2)
-                .name("Helados")
-                .build();
-
         Category botanas = Category.builder()
-                .id(3)
+                .id(2)
                 .name("Botanas")
                 .build();
 
         Category dulces = Category.builder()
-                .id(4)
+                .id(3)
                 .name("Dulces")
                 .build();
 
-        papasFritas = Subcategory.builder()
-                .id(1)
-                .name("Papas fritas")
-                .category(botanas)
+        Category helados = Category.builder()
+                .id(4)
+                .name("Helados")
                 .build();
 
         aguaMineral = Subcategory.builder()
-                .id(2)
+                .id(1)
                 .name("Agua mineral")
                 .category(bebidas)
+                .build();
+
+        chocolate = Subcategory.builder()
+                .id(2)
+                .name("Chocolate")
+                .category(dulces)
                 .build();
 
         heladoLeche = Subcategory.builder()
@@ -101,10 +101,10 @@ public class ISubcategoryServiceImplTest {
                 .category(helados)
                 .build();
 
-        chocolate = Subcategory.builder()
+        papasFritas = Subcategory.builder()
                 .id(4)
-                .name("Chocolate")
-                .category(dulces)
+                .name("Papas fritas")
+                .category(botanas)
                 .build();
 
         // Guardar una nueva subcategoría
@@ -134,7 +134,7 @@ public class ISubcategoryServiceImplTest {
     }
 
     @Test
-    public void findAllByNameAsc_ExistingSubcategories_Return_ListOfSubcategories() {
+    public void findAll_OrderByNameAsc_ExistingSubcategories_Return_ListOfSubcategories() {
         // Given
         int pageNumber = 0;
         int pageSize = 5;
@@ -211,32 +211,107 @@ public class ISubcategoryServiceImplTest {
     }
 
     @Test
+    public void findAllByName_OrderByNameAsc_ExistingSubcategories_Return_ListOfSubcategories() {
+        // Given
+        String word = "la";
+        int pageNumber = 0;
+        int pageSize = 5;
+        String sortBy = "name";
+
+        List<Subcategory> subcategories = new ArrayList<>();
+        subcategories.add(chocolate);
+        subcategories.add(heladoLeche);
+
+        Pageable pageable = PageRequest.ofSize(pageSize)
+                .withPage(pageNumber)
+                .withSort(Sort.by(sortBy).ascending());
+
+        given(subcategoryDao.findByNameContainingIgnoreCase(word, pageable)).willReturn(
+                new PageImpl<>(subcategories, pageable, subcategories.size())
+        );
+
+        // When
+        CustomPaginationData<SubcategoryResponseDto, Subcategory> subcategoriesData = subcategoryService.findAllByName(
+                "la",
+                PageRequest.of(0, 5, Sort.by("name").ascending())
+        );
+
+        // Then
+        List<SubcategoryResponseDto> data = subcategoriesData.getData();
+        CustomPageMetadata meta = subcategoriesData.getMetadata();
+
+        assertThat(data.size()).isEqualTo(2);
+        assertThat(data.get(0).getName()).isEqualTo("Chocolate");
+        assertThat(data.get(1).getName()).isEqualTo("Helado base leche");
+
+        assertThat(meta.getPageNumber()).isZero();
+        assertThat(meta.getPageSize()).isEqualTo(5);
+        assertThat(meta.getNumberOfElements()).isEqualTo(2);
+        assertThat(meta.getTotalElements()).isEqualTo(2);
+        assertThat(meta.getTotalPages()).isEqualTo(1);
+    }
+
+    @Test
+    public void findAllByName_NonExistingSubcategories_Return_EmptyListOfSubcategories() {
+        String word = "lu";
+        int pageNumber = 0;
+        int pageSize = 5;
+        String sortBy = "id";
+
+        List<Subcategory> subcategories = new ArrayList<>();
+
+        Pageable pageable = PageRequest.ofSize(pageSize)
+                .withPage(pageNumber)
+                .withSort(Sort.by(sortBy).ascending());
+
+        given(subcategoryDao.findByNameContainingIgnoreCase(word, pageable)).willReturn(
+                new PageImpl<>(subcategories, pageable, 0)
+        );
+
+        // When
+        CustomPaginationData<SubcategoryResponseDto, Subcategory> subcategoriesData = subcategoryService.findAllByName(
+                "lu",
+                PageRequest.of(0, 5, Sort.by("id").ascending())
+        );
+
+        // Then
+        List<SubcategoryResponseDto> data = subcategoriesData.getData();
+        CustomPageMetadata meta = subcategoriesData.getMetadata();
+
+        assertThat(data.size()).isEqualTo(0);
+
+        assertThat(meta.getPageNumber()).isEqualTo(0);
+        assertThat(meta.getPageSize()).isEqualTo(5);
+        assertThat(meta.getNumberOfElements()).isEqualTo(0);
+        assertThat(meta.getTotalElements()).isEqualTo(0);
+        assertThat(meta.getTotalPages()).isEqualTo(0);
+    }
+
+    @Test
     public void findById_ExistingSubcategory_Return_FoundSubcategory() {
         // Given
         Integer subcategoryId = 1;
 
-        given(subcategoryDao.findById(subcategoryId)).willReturn(Optional.of(papasFritas));
+        given(subcategoryDao.findById(subcategoryId)).willReturn(Optional.of(aguaMineral));
 
         // When
-        SubcategoryResponseDto foundSubcategory = subcategoryService.findById(subcategoryId);
+        SubcategoryResponseDto foundSubcategory = subcategoryService.findById(1);
 
         // Then
         assertThat(foundSubcategory).isNotNull();
         assertThat(foundSubcategory.getId()).isEqualTo(1);
-        assertThat(foundSubcategory.getName()).isEqualTo("Papas fritas");
+        assertThat(foundSubcategory.getName()).isEqualTo("Agua mineral");
         assertThat(foundSubcategory.getDescription()).isEqualTo(null);
     }
 
     @Test
     public void findById_NonExistingSubcategory_Throw_DataNotFoundException() {
         // Given
-        Integer subcategoryId = 100;
-
         given(subcategoryDao.findById(anyInt())).willReturn(Optional.empty());
 
         // When
         Throwable thrown = assertThrows(DataNotFoundException.class,
-                () -> subcategoryService.findById(subcategoryId));
+                () -> subcategoryService.findById(100));
 
         // Then
         MatcherAssert.assertThat(thrown.getMessage(), is("Subcategory not found!"));
@@ -279,7 +354,7 @@ public class ISubcategoryServiceImplTest {
         given(subcategoryDao.save(subcategoryToUpdateGomitas)).willReturn(subcategoryUpdatedGomitas);
 
         // When
-        SubcategoryResponseDto updatedSubcategory = subcategoryService.update(subcategoryId, subcategoryUpdateRequestGomitas);
+        SubcategoryResponseDto updatedSubcategory = subcategoryService.update(5, subcategoryUpdateRequestGomitas);
 
         // Then
         assertThat(updatedSubcategory).isNotNull();
@@ -291,13 +366,11 @@ public class ISubcategoryServiceImplTest {
     @Test
     public void update_NonExistingSubcategory_Throw_DataNotFoundException() {
         // Given
-        Integer subcategoryId = 100;
-
-        given(subcategoryDao.findById(subcategoryId)).willReturn(Optional.empty());
+        given(subcategoryDao.findById(anyInt())).willReturn(Optional.empty());
 
         // When
         Throwable thrown = assertThrows(DataNotFoundException.class,
-                () -> subcategoryService.update(subcategoryId, subcategoryUpdateRequestGomitas));
+                () -> subcategoryService.update(100, subcategoryUpdateRequestGomitas));
 
         // Then
         MatcherAssert.assertThat(thrown.getMessage(), is("Subcategory does not exist!"));
@@ -306,14 +379,12 @@ public class ISubcategoryServiceImplTest {
     @Test
     public void deleteById_Category_NoReturn() {
         // Given
-        Integer subcategoryId = 10;
-
         willDoNothing().given(subcategoryDao).deleteById(anyInt());
 
         // When
-        subcategoryService.deleteById(subcategoryId);
+        subcategoryService.deleteById(10);
 
         // Then
-        verify(subcategoryDao, times(1)).deleteById(subcategoryId);
+        verify(subcategoryDao, times(1)).deleteById(10);
     }
 }

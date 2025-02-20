@@ -54,10 +54,10 @@ public class SubcategoryControllerTest {
     private static final String url = "/api/v1/subcategory";
 
     // Buscar todas las subcategorías
-    private static SubcategoryResponseDto subcategoryResponsePapasFritas;
     private static SubcategoryResponseDto subcategoryResponseAguaMineral;
-    private static SubcategoryResponseDto subcategoryResponseHeladoLeche;
     private static SubcategoryResponseDto subcategoryResponseChocolate;
+    private static SubcategoryResponseDto subcategoryResponseHeladoLeche;
+    private static SubcategoryResponseDto subcategoryResponsePapasFritas;
 
     // Guardar una nueva subcategoría
     private static SubcategorySaveRequestDto subcategorySaveRequestGomitas;
@@ -75,31 +75,31 @@ public class SubcategoryControllerTest {
                 .name("Bebidas")
                 .build();
 
-        CategoryOfSubcategoryResponseDto helados = CategoryOfSubcategoryResponseDto.builder()
-                .id(2)
-                .name("Helados")
-                .build();
-
         CategoryOfSubcategoryResponseDto botanas = CategoryOfSubcategoryResponseDto.builder()
-                .id(3)
+                .id(2)
                 .name("Botanas")
                 .build();
 
         CategoryOfSubcategoryResponseDto dulces = CategoryOfSubcategoryResponseDto.builder()
-                .id(4)
+                .id(3)
                 .name("Dulces")
                 .build();
 
-        subcategoryResponsePapasFritas = SubcategoryResponseDto.builder()
-                .id(1)
-                .name("Papas fritas")
-                .category(botanas)
+        CategoryOfSubcategoryResponseDto helados = CategoryOfSubcategoryResponseDto.builder()
+                .id(4)
+                .name("Helados")
                 .build();
 
         subcategoryResponseAguaMineral = SubcategoryResponseDto.builder()
-                .id(2)
+                .id(1)
                 .name("Agua mineral")
                 .category(bebidas)
+                .build();
+
+        subcategoryResponseChocolate = SubcategoryResponseDto.builder()
+                .id(2)
+                .name("Chocolate")
+                .category(dulces)
                 .build();
 
         subcategoryResponseHeladoLeche = SubcategoryResponseDto.builder()
@@ -108,15 +108,15 @@ public class SubcategoryControllerTest {
                 .category(helados)
                 .build();
 
-        subcategoryResponseChocolate = SubcategoryResponseDto.builder()
+        subcategoryResponsePapasFritas = SubcategoryResponseDto.builder()
                 .id(4)
-                .name("Chocolate")
-                .category(dulces)
+                .name("Papas fritas")
+                .category(botanas)
                 .build();
 
         // Guardar una nueva categoría
         CategoryOfSubcategoryRequestDto categoryOfSubcategoryRequestDulces = CategoryOfSubcategoryRequestDto.builder()
-                .id(4)
+                .id(3)
                 .name("Dulces")
                 .build();
 
@@ -137,7 +137,7 @@ public class SubcategoryControllerTest {
     }
 
     @Test
-    public void findAllByNameAsc_ExistingSubcategories_Return_IsOk() throws Exception {
+    public void getAllByNameAsc_ExistingSubcategories_Return_IsOk() throws Exception {
         //Given
         int pageNumber = 0;
         int pageSize = 5;
@@ -181,28 +181,28 @@ public class SubcategoryControllerTest {
 
         response.andExpect(MockMvcResultMatchers.jsonPath("$.data", hasSize(4)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].name",
-                        CoreMatchers.is(subcategoryResponseAguaMineral.getName())))
+                        CoreMatchers.is("Agua mineral")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[1].name",
-                        CoreMatchers.is(subcategoryResponseChocolate.getName())))
+                        CoreMatchers.is("Chocolate")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[2].name",
-                        CoreMatchers.is(subcategoryResponseHeladoLeche.getName())))
+                        CoreMatchers.is("Helado base leche")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[3].name",
-                        CoreMatchers.is(subcategoryResponsePapasFritas.getName())));
+                        CoreMatchers.is("Papas fritas")));
 
         response.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pageNumber",
-                        CoreMatchers.is(pageNumber)))
+                        CoreMatchers.is(0)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pageSize",
-                        CoreMatchers.is(pageSize)))
+                        CoreMatchers.is(5)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.metadata.numberOfElements",
-                        CoreMatchers.is(foundSubcategories.size())))
+                        CoreMatchers.is(4)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.metadata.totalPages",
                         CoreMatchers.is(1)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.metadata.totalElements",
-                        CoreMatchers.is(foundSubcategories.size())));
+                        CoreMatchers.is(4)));
     }
 
     @Test
-    public void findAll_NoExistingSubcategories_Return_IsOk() throws Exception {
+    public void getAll_NoExistingSubcategories_Return_IsOk() throws Exception {
         //Given
         int pageNumber = 0;
         int pageSize = 5;
@@ -239,26 +239,136 @@ public class SubcategoryControllerTest {
         response.andExpect(MockMvcResultMatchers.jsonPath("$.data", hasSize(0)));
 
         response.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pageNumber",
-                        CoreMatchers.is(pageNumber)))
+                        CoreMatchers.is(0)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pageSize",
-                        CoreMatchers.is(pageSize)))
+                        CoreMatchers.is(5)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.metadata.numberOfElements",
-                        CoreMatchers.is(foundSubcategories.size())))
+                        CoreMatchers.is(0)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.metadata.totalPages",
                         CoreMatchers.is(0)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.metadata.totalElements",
-                        CoreMatchers.is(foundSubcategories.size())));
+                        CoreMatchers.is(0)));
     }
 
     @Test
-    public void findById_ExistingSubcategory_Return_IsOk() throws Exception {
+    public void getAllByName_OrderByNameAsc_ExistingSubcategories_Return_IsOk() throws Exception {
+        //Given
+        String word = "la";
+        int pageNumber = 0;
+        int pageSize = 5;
+        String sortBy = "name";
+        Pageable pageable = PageRequest.ofSize(pageSize)
+                .withPage(pageNumber)
+                .withSort(Sort.by(sortBy).ascending());
+
+        List<SubcategoryResponseDto> foundSubcategories = new ArrayList<>();
+        foundSubcategories.add(subcategoryResponseChocolate);
+        foundSubcategories.add(subcategoryResponseHeladoLeche);
+
+        CustomPageMetadata metadata = CustomPageMetadata.builder()
+                .pageNumber(pageNumber)
+                .pageSize(pageSize)
+                .numberOfElements(foundSubcategories.size())
+                .totalPages((int) Math.ceil((double) foundSubcategories.size() / pageSize))
+                .totalElements(foundSubcategories.size())
+                .build();
+
+        given(subcategoryService.findAllByName(word, pageable)).willReturn(
+                CustomPaginationData.<SubcategoryResponseDto, Subcategory>builder()
+                        .data(foundSubcategories)
+                        .metadata(metadata)
+                        .build()
+        );
+
+        // When
+        ResultActions response = mockMvc.perform(get(url + "/getAllByName/{word}", "la")
+                .param("page", "0")
+                .param("size", "5")
+                .param("sort", "name,asc")
+        );
+
+        // Then
+        response.andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                        CoreMatchers.is("Found subcategories!")));
+
+        response.andExpect(MockMvcResultMatchers.jsonPath("$.data", hasSize(2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].name",
+                        CoreMatchers.is("Chocolate")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[1].name",
+                        CoreMatchers.is("Helado base leche")));
+
+        response.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pageNumber",
+                        CoreMatchers.is(0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pageSize",
+                        CoreMatchers.is(5)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.metadata.numberOfElements",
+                        CoreMatchers.is(2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.metadata.totalPages",
+                        CoreMatchers.is(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.metadata.totalElements",
+                        CoreMatchers.is(2)));
+    }
+
+    @Test
+    public void getAllByName_NoExistingCategories_Return_IsOk() throws Exception {
+        //Given
+        String word = "lu";
+        int pageNumber = 0;
+        int pageSize = 5;
+        String sortBy = "id";
+        Pageable pageable = PageRequest.ofSize(pageSize)
+                .withPage(pageNumber)
+                .withSort(Sort.by(sortBy).ascending());
+
+        List<SubcategoryResponseDto> foundSubcategories = new ArrayList<>();
+
+        CustomPageMetadata metadata = CustomPageMetadata.builder()
+                .pageNumber(pageNumber)
+                .pageSize(pageSize)
+                .numberOfElements(0)
+                .totalPages(0)
+                .totalElements(0)
+                .build();
+
+        given(subcategoryService.findAllByName(word, pageable)).willReturn(
+                CustomPaginationData.<SubcategoryResponseDto, Subcategory>builder()
+                        .data(foundSubcategories)
+                        .metadata(metadata)
+                        .build()
+        );
+
+        // When
+        ResultActions response = mockMvc.perform(get(url + "/getAllByName/{word}", "lu"));
+
+        // Then
+        response.andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                        CoreMatchers.is("Found subcategories!")));
+
+        response.andExpect(MockMvcResultMatchers.jsonPath("$.data", hasSize(0)));
+
+        response.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pageNumber",
+                        CoreMatchers.is(0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pageSize",
+                        CoreMatchers.is(5)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.metadata.numberOfElements",
+                        CoreMatchers.is(0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.metadata.totalPages",
+                        CoreMatchers.is(0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.metadata.totalElements",
+                        CoreMatchers.is(0)));
+    }
+
+    @Test
+    public void getById_ExistingSubcategory_Return_IsOk() throws Exception {
         //Given
         Integer subcategoryId = 1;
 
-        given(subcategoryService.findById(subcategoryId)).willReturn(subcategoryResponsePapasFritas);
+        given(subcategoryService.findById(subcategoryId)).willReturn(subcategoryResponseAguaMineral);
 
         // When
-        ResultActions response = mockMvc.perform(get(url + "/get/{id}", subcategoryId));
+        ResultActions response = mockMvc.perform(get(url + "/get/{id}", 1));
 
         // Then
         response.andExpect(MockMvcResultMatchers.status().isOk())
@@ -266,15 +376,15 @@ public class SubcategoryControllerTest {
                         CoreMatchers.is("Found subcategory!")));
 
         response.andExpect(MockMvcResultMatchers.jsonPath("$.data[0].id")
-                        .value(subcategoryResponsePapasFritas.getId()))
+                        .value(1))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].name",
-                        CoreMatchers.is(subcategoryResponsePapasFritas.getName())))
+                        CoreMatchers.is("Agua mineral")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].category.name",
-                        CoreMatchers.is(subcategoryResponsePapasFritas.getCategory().getName())));
+                        CoreMatchers.is("Bebidas")));
     }
 
     @Test
-    public void findById_NonExistingSubcategory_Return_IsNotFound() throws Exception {
+    public void getById_NonExistingSubcategory_Return_IsNotFound() throws Exception {
         //Given
         Integer subcategoryId = 100;
 
@@ -282,7 +392,7 @@ public class SubcategoryControllerTest {
                 .willThrow(new DataNotFoundException("Subcategory not found!"));
 
         // When
-        ResultActions response = mockMvc.perform(get(url + "/get/{id}", subcategoryId));
+        ResultActions response = mockMvc.perform(get(url + "/get/{id}", 100));
 
         // Then
         response.andExpect(MockMvcResultMatchers.status().isNotFound())
@@ -291,12 +401,9 @@ public class SubcategoryControllerTest {
     }
 
     @Test
-    public void findById_StringId_Return_IsInternalServerError() throws Exception {
-        //Given
-        String subcategoryId = "one";
-
+    public void getById_StringId_Return_IsInternalServerError() throws Exception {
         // When
-        ResultActions response = mockMvc.perform(get(url + "/get/{id}", subcategoryId));
+        ResultActions response = mockMvc.perform(get(url + "/get/{id}", "one"));
 
         // Then
         response.andExpect(MockMvcResultMatchers.status().isInternalServerError());
@@ -319,7 +426,7 @@ public class SubcategoryControllerTest {
                         CoreMatchers.is("Saved subcategory!")));
 
         response.andExpect(MockMvcResultMatchers.jsonPath("$.data[0].name",
-                CoreMatchers.is(subcategorySavedResponseGomitas.getName())));
+                CoreMatchers.is("Gomitas")));
     }
 
     @Test
@@ -348,7 +455,7 @@ public class SubcategoryControllerTest {
                 .willReturn(subcategoryUpdatedResponseGomitas);
 
         // When
-        ResultActions response = mockMvc.perform(put(url + "/update/{id}", subcategoryId)
+        ResultActions response = mockMvc.perform(put(url + "/update/{id}", 5)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(subcategoryUpdateRequestGomitas)));
 
@@ -358,19 +465,17 @@ public class SubcategoryControllerTest {
                         CoreMatchers.is("Updated subcategory!")));
 
         response.andExpect(MockMvcResultMatchers.jsonPath("$.data[0].name",
-                CoreMatchers.is(subcategoryUpdatedResponseGomitas.getName())));
+                CoreMatchers.is("Caramelos de goma")));
     }
 
     @Test
     public void update_NonExistingSubcategory_Return_IsNotFound() throws Exception {
         // Given
-        Integer subcategoryId = 100;
-
         given(subcategoryService.update(anyInt(), any(SubcategorySaveRequestDto.class)))
                 .willThrow(new DataNotFoundException("Subcategory does not exist!"));
 
         // When
-        ResultActions response = mockMvc.perform(put(url + "/update/{id}", subcategoryId)
+        ResultActions response = mockMvc.perform(put(url + "/update/{id}", 100)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(subcategoryUpdateRequestGomitas)));
 
@@ -380,16 +485,13 @@ public class SubcategoryControllerTest {
                         CoreMatchers.is("Subcategory does not exist!")));
     }
 
-
     @Test
     public void deleteById_Subcategory_Return_IsOk() throws Exception {
         // Given
-        Integer subcategoryId = 10;
-
         willDoNothing().given(subcategoryService).deleteById(anyInt());
 
         // When
-        ResultActions response = mockMvc.perform(delete(url + "/delete/{id}", subcategoryId));
+        ResultActions response = mockMvc.perform(delete(url + "/delete/{id}", 10));
 
         // Then
         response.andExpect(MockMvcResultMatchers.status().isOk())

@@ -4,11 +4,12 @@ import com.alivro.spring.sleepyringtail.dao.CategoryDao;
 import com.alivro.spring.sleepyringtail.exception.DataAlreadyExistsException;
 import com.alivro.spring.sleepyringtail.exception.DataNotFoundException;
 import com.alivro.spring.sleepyringtail.model.Category;
-import com.alivro.spring.sleepyringtail.model.category.request.CategorySaveRequestDto;
+import com.alivro.spring.sleepyringtail.model.category.request.CategoryGenericRequestDto;
+import com.alivro.spring.sleepyringtail.model.category.response.CategoryGenericResponseDto;
 import com.alivro.spring.sleepyringtail.model.category.response.CategoryGetResponseDto;
-import com.alivro.spring.sleepyringtail.model.category.response.CategorySaveResponseDto;
 import com.alivro.spring.sleepyringtail.service.ICategoryService;
 import com.alivro.spring.sleepyringtail.util.pagination.CustomPaginationData;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import java.util.Optional;
 @Service
 public class ICategoryServiceImpl implements ICategoryService {
     private final CategoryDao categoryDao;
+    private final ModelMapper modelMapper = new ModelMapper();
     private final Logger logger = LoggerFactory.getLogger(ICategoryServiceImpl.class);
 
     /**
@@ -41,14 +43,14 @@ public class ICategoryServiceImpl implements ICategoryService {
      * @return Información de todas las categorías
      */
     @Override
-    public CustomPaginationData<CategoryGetResponseDto, Category> findAll(Pageable pageable) {
+    public CustomPaginationData<CategoryGenericResponseDto, Category> findAll(Pageable pageable) {
         logger.info("Busca todas las categorías.");
 
         Page<Category> categoriesPage = categoryDao.findAll(pageable);
 
         // Información de las categorías
-        List<CategoryGetResponseDto> foundCategories = categoriesPage.stream()
-                .map(CategoryGetResponseDto::mapEntityToResponseDto)
+        List<CategoryGenericResponseDto> foundCategories = categoriesPage.stream()
+                .map(c -> modelMapper.map(c, CategoryGenericResponseDto.class))
                 .toList();
 
         return new CustomPaginationData<>(foundCategories, categoriesPage);
@@ -62,14 +64,14 @@ public class ICategoryServiceImpl implements ICategoryService {
      * @return Información de las categorías que cumplen con el criterio de búsqueda
      */
     @Override
-    public CustomPaginationData<CategoryGetResponseDto, Category> findAllByName(String word, Pageable pageable) {
+    public CustomPaginationData<CategoryGenericResponseDto, Category> findAllByName(String word, Pageable pageable) {
         logger.info("Busca todas las categorías.");
 
         Page<Category> categoriesPage = categoryDao.findByNameContainingIgnoreCase(word, pageable);
 
         // Información de las categorías
-        List<CategoryGetResponseDto> foundCategories = categoriesPage.stream()
-                .map(CategoryGetResponseDto::mapEntityToResponseDto)
+        List<CategoryGenericResponseDto> foundCategories = categoriesPage.stream()
+                .map(c -> modelMapper.map(c, CategoryGenericResponseDto.class))
                 .toList();
 
         return new CustomPaginationData<>(foundCategories, categoriesPage);
@@ -93,7 +95,7 @@ public class ICategoryServiceImpl implements ICategoryService {
             throw new DataNotFoundException("Category not found!");
         }
 
-        return CategoryGetResponseDto.mapEntityToResponseDto(foundCategory.get());
+        return modelMapper.map(foundCategory.get(), CategoryGetResponseDto.class);
     }
 
     /**
@@ -103,7 +105,7 @@ public class ICategoryServiceImpl implements ICategoryService {
      * @return Información de la categoría guardada
      */
     @Override
-    public CategorySaveResponseDto save(CategorySaveRequestDto request) {
+    public CategoryGenericResponseDto save(CategoryGenericRequestDto request) {
         String name = request.getName();
 
         logger.info("Busca categoría. Nombre: {}", name);
@@ -121,10 +123,10 @@ public class ICategoryServiceImpl implements ICategoryService {
 
         // Guarda la información de la nueva categoría
         Category savedCategory = categoryDao.save(
-                CategorySaveRequestDto.mapRequestDtoToEntity(request)
+                modelMapper.map(request, Category.class)
         );
 
-        return CategorySaveResponseDto.mapEntityToResponseDto(savedCategory);
+        return modelMapper.map(savedCategory, CategoryGenericResponseDto.class);
     }
 
     /**
@@ -135,7 +137,7 @@ public class ICategoryServiceImpl implements ICategoryService {
      * @return Información de la categoría actualizada
      */
     @Override
-    public CategorySaveResponseDto update(Integer id, CategorySaveRequestDto request) {
+    public CategoryGenericResponseDto update(Integer id, CategoryGenericRequestDto request) {
         logger.info("Busca categoría. ID: {}", id);
 
         Optional<Category> foundCategory = categoryDao.findById(id);
@@ -158,7 +160,7 @@ public class ICategoryServiceImpl implements ICategoryService {
         // Actualiza la información de la categoría
         Category updatedCategory = categoryDao.save(categoryToUpdate);
 
-        return CategorySaveResponseDto.mapEntityToResponseDto(updatedCategory);
+        return modelMapper.map(updatedCategory, CategoryGenericResponseDto.class);
     }
 
     /**

@@ -1,9 +1,9 @@
 package com.alivro.spring.sleepyringtail.service;
 
 import com.alivro.spring.sleepyringtail.model.Category;
-import com.alivro.spring.sleepyringtail.model.category.request.CategorySaveRequestDto;
+import com.alivro.spring.sleepyringtail.model.category.request.CategoryGenericRequestDto;
+import com.alivro.spring.sleepyringtail.model.category.response.CategoryGenericResponseDto;
 import com.alivro.spring.sleepyringtail.model.category.response.CategoryGetResponseDto;
-import com.alivro.spring.sleepyringtail.model.category.response.CategorySaveResponseDto;
 import com.alivro.spring.sleepyringtail.util.pagination.CustomPaginationData;
 import org.springframework.data.domain.Pageable;
 
@@ -14,7 +14,7 @@ public interface ICategoryService {
      * @param pageable Información de paginación
      * @return Información de todas las categorías
      */
-    CustomPaginationData<CategoryGetResponseDto, Category> findAll(Pageable pageable);
+    CustomPaginationData<CategoryGenericResponseDto, Category> findAll(Pageable pageable);
 
     /**
      * Método para buscar las categorías que contengan una palabra dada
@@ -23,7 +23,7 @@ public interface ICategoryService {
      * @param pageable Información de paginación
      * @return Información de las categorías que cumplen con el criterio de búsqueda
      */
-    CustomPaginationData<CategoryGetResponseDto, Category> findAllByName(String word, Pageable pageable);
+    CustomPaginationData<CategoryGenericResponseDto, Category> findAllByName(String word, Pageable pageable);
 
     /**
      * Método para buscar una categoría por su ID
@@ -39,7 +39,7 @@ public interface ICategoryService {
      * @param request Información de la categoría a guardar
      * @return Información de la categoría guardada
      */
-    CategorySaveResponseDto save(CategorySaveRequestDto request);
+    CategoryGenericResponseDto save(CategoryGenericRequestDto request);
 
     /**
      * Método para actualizar la información de una categoría
@@ -48,7 +48,7 @@ public interface ICategoryService {
      * @param request Información de la categoría a actualizar
      * @return Información de la categoría actualizada
      */
-    CategorySaveResponseDto update(Integer id, CategorySaveRequestDto request);
+    CategoryGenericResponseDto update(Integer id, CategoryGenericRequestDto request);
 
     /**
      * Método para eliminar una categoría por su ID

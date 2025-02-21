@@ -3,10 +3,10 @@ package com.alivro.spring.sleepyringtail.controller;
 import com.alivro.spring.sleepyringtail.exception.DataAlreadyExistsException;
 import com.alivro.spring.sleepyringtail.exception.DataNotFoundException;
 import com.alivro.spring.sleepyringtail.model.Category;
-import com.alivro.spring.sleepyringtail.model.category.request.CategorySaveRequestDto;
+import com.alivro.spring.sleepyringtail.model.category.request.CategoryGenericRequestDto;
+import com.alivro.spring.sleepyringtail.model.category.response.CategoryGenericResponseDto;
 import com.alivro.spring.sleepyringtail.model.category.response.CategoryGetResponseDto;
-import com.alivro.spring.sleepyringtail.model.category.response.CategorySaveResponseDto;
-import com.alivro.spring.sleepyringtail.model.category.response.SubcategoryOfCategoryResponseDto;
+import com.alivro.spring.sleepyringtail.model.util.response.SubcategoryResponseDto;
 import com.alivro.spring.sleepyringtail.service.ICategoryService;
 import com.alivro.spring.sleepyringtail.util.pagination.CustomPageMetadata;
 import com.alivro.spring.sleepyringtail.util.pagination.CustomPaginationData;
@@ -32,7 +32,8 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -54,79 +55,70 @@ public class CategoryControllerTest {
     private static final String url = "/api/v1/category";
 
     // Buscar todas las categorías
-    private static CategoryGetResponseDto categoryResponseBebidas;
-    private static CategoryGetResponseDto categoryResponseBotanas;
-    private static CategoryGetResponseDto categoryResponseDulces;
-    private static CategoryGetResponseDto categoryResponseHelados;
+    private static CategoryGenericResponseDto bebidasGetAllResponse;
+    private static CategoryGenericResponseDto botanasGetAllResponse;
+    private static CategoryGenericResponseDto dulcesGetAllResponse;
+    private static CategoryGenericResponseDto heladosGetAllResponse;
+
+    // Buscar por ID
+    private static CategoryGetResponseDto bebidasGetResponse;
 
     // Guardar una nueva categoría
-    private static CategorySaveRequestDto categorySaveRequestVinos;
-    private static CategorySaveResponseDto categorySavedResponseVinos;
+    private static CategoryGenericRequestDto vinosSaveRequest;
+    private static CategoryGenericResponseDto vinosSavedResponse;
 
     // Actualizar una categoría existente
-    private static CategorySaveRequestDto categoryUpdateRequestVinos;
-    private static CategorySaveResponseDto categoryUpdatedResponseVinos;
+    private static CategoryGenericRequestDto vinosUpdateRequest;
+    private static CategoryGenericResponseDto vinosUpdatedResponse;
 
     @BeforeAll
     public static void setup() {
         // Buscar todas las categorías
-                SubcategoryOfCategoryResponseDto aguaMineral = SubcategoryOfCategoryResponseDto.builder()
-                .id(1)
-                .name("Agua mineral")
-                .build();
-
-        SubcategoryOfCategoryResponseDto chocolate = SubcategoryOfCategoryResponseDto.builder()
-                .id(2)
-                .name("Chocolate")
-                .build();
-
-        SubcategoryOfCategoryResponseDto heladoLeche = SubcategoryOfCategoryResponseDto.builder()
-                .id(3)
-                .name("Helado base leche")
-                .build();
-
-        SubcategoryOfCategoryResponseDto papasFritas = SubcategoryOfCategoryResponseDto.builder()
-                .id(4)
-                .name("Papas fritas")
-                .build();
-
-        categoryResponseBebidas = CategoryGetResponseDto.builder()
+        bebidasGetAllResponse = CategoryGenericResponseDto.builder()
                 .id(1)
                 .name("Bebidas")
-                .subcategories(Collections.singletonList(aguaMineral))
                 .build();
 
-        categoryResponseBotanas = CategoryGetResponseDto.builder()
+        botanasGetAllResponse = CategoryGenericResponseDto.builder()
                 .id(2)
                 .name("Botanas")
-                .subcategories(Collections.singletonList(papasFritas))
                 .build();
 
-        categoryResponseDulces = CategoryGetResponseDto.builder()
+        dulcesGetAllResponse = CategoryGenericResponseDto.builder()
                 .id(3)
                 .name("Dulces")
-                .subcategories(Collections.singletonList(chocolate))
                 .build();
 
-        categoryResponseHelados = CategoryGetResponseDto.builder()
+        heladosGetAllResponse = CategoryGenericResponseDto.builder()
                 .id(4)
                 .name("Helados")
-                .subcategories(Collections.singletonList(heladoLeche))
+                .build();
+
+        // Buscar por ID
+        SubcategoryResponseDto aguaNaturalResponse = SubcategoryResponseDto.builder()
+                .id(1)
+                .name("Agua natural")
+                .build();
+
+        bebidasGetResponse = CategoryGetResponseDto.builder()
+                .id(1)
+                .name("Bebidas")
+                .subcategories(Collections.singletonList(aguaNaturalResponse))
                 .build();
 
         // Guardar una nueva categoría
-        categorySaveRequestVinos = CategorySaveRequestDto.builder()
+        vinosSaveRequest = CategoryGenericRequestDto.builder()
                 .name("Vinos")
                 .build();
 
-        categorySavedResponseVinos = mapRequestDtoToResponseDto(5, categorySaveRequestVinos);
+        vinosSavedResponse = mapRequestDtoToResponseDto(5, vinosSaveRequest);
 
         // Actualizar una categoría existente
-        categoryUpdateRequestVinos = CategorySaveRequestDto.builder()
+        vinosUpdateRequest = CategoryGenericRequestDto.builder()
                 .name("Vinos y Licores")
                 .build();
 
-        categoryUpdatedResponseVinos = mapRequestDtoToResponseDto(5, categoryUpdateRequestVinos);
+        vinosUpdatedResponse = mapRequestDtoToResponseDto(5, vinosUpdateRequest);
     }
 
     @Test
@@ -139,11 +131,11 @@ public class CategoryControllerTest {
                 .withPage(pageNumber)
                 .withSort(Sort.by(sortBy).ascending());
 
-        List<CategoryGetResponseDto> foundCategories = new ArrayList<>();
-        foundCategories.add(categoryResponseBebidas);
-        foundCategories.add(categoryResponseBotanas);
-        foundCategories.add(categoryResponseDulces);
-        foundCategories.add(categoryResponseHelados);
+        List<CategoryGenericResponseDto> foundCategories = new ArrayList<>();
+        foundCategories.add(bebidasGetAllResponse);
+        foundCategories.add(botanasGetAllResponse);
+        foundCategories.add(dulcesGetAllResponse);
+        foundCategories.add(heladosGetAllResponse);
 
         CustomPageMetadata metadata = CustomPageMetadata.builder()
                 .pageNumber(pageNumber)
@@ -154,7 +146,7 @@ public class CategoryControllerTest {
                 .build();
 
         given(categoryService.findAll(pageable)).willReturn(
-                CustomPaginationData.<CategoryGetResponseDto, Category>builder()
+                CustomPaginationData.<CategoryGenericResponseDto, Category>builder()
                         .data(foundCategories)
                         .metadata(metadata)
                         .build()
@@ -204,7 +196,7 @@ public class CategoryControllerTest {
                 .withPage(pageNumber)
                 .withSort(Sort.by(sortBy).ascending());
 
-        List<CategoryGetResponseDto> foundCategories = new ArrayList<>();
+        List<CategoryGenericResponseDto> foundCategories = new ArrayList<>();
 
         CustomPageMetadata metadata = CustomPageMetadata.builder()
                 .pageNumber(pageNumber)
@@ -215,7 +207,7 @@ public class CategoryControllerTest {
                 .build();
 
         given(categoryService.findAll(pageable)).willReturn(
-                CustomPaginationData.<CategoryGetResponseDto, Category>builder()
+                CustomPaginationData.<CategoryGenericResponseDto, Category>builder()
                         .data(foundCategories)
                         .metadata(metadata)
                         .build()
@@ -254,9 +246,9 @@ public class CategoryControllerTest {
                 .withPage(pageNumber)
                 .withSort(Sort.by(sortBy).ascending());
 
-        List<CategoryGetResponseDto> foundCategories = new ArrayList<>();
-        foundCategories.add(categoryResponseBebidas);
-        foundCategories.add(categoryResponseBotanas);
+        List<CategoryGenericResponseDto> foundCategories = new ArrayList<>();
+        foundCategories.add(bebidasGetAllResponse);
+        foundCategories.add(botanasGetAllResponse);
 
         CustomPageMetadata metadata = CustomPageMetadata.builder()
                 .pageNumber(pageNumber)
@@ -267,7 +259,7 @@ public class CategoryControllerTest {
                 .build();
 
         given(categoryService.findAllByName(word, pageable)).willReturn(
-                CustomPaginationData.<CategoryGetResponseDto, Category>builder()
+                CustomPaginationData.<CategoryGenericResponseDto, Category>builder()
                         .data(foundCategories)
                         .metadata(metadata)
                         .build()
@@ -314,7 +306,7 @@ public class CategoryControllerTest {
                 .withPage(pageNumber)
                 .withSort(Sort.by(sortBy).ascending());
 
-        List<CategoryGetResponseDto> foundCategories = new ArrayList<>();
+        List<CategoryGenericResponseDto> foundCategories = new ArrayList<>();
 
         CustomPageMetadata metadata = CustomPageMetadata.builder()
                 .pageNumber(pageNumber)
@@ -325,7 +317,7 @@ public class CategoryControllerTest {
                 .build();
 
         given(categoryService.findAllByName(word, pageable)).willReturn(
-                CustomPaginationData.<CategoryGetResponseDto, Category>builder()
+                CustomPaginationData.<CategoryGenericResponseDto, Category>builder()
                         .data(foundCategories)
                         .metadata(metadata)
                         .build()
@@ -354,11 +346,11 @@ public class CategoryControllerTest {
     }
 
     @Test
-    public void findById_ExistingCategory_Return_IsOk() throws Exception {
+    public void get_ExistingCategory_Return_IsOk() throws Exception {
         //Given
         Integer categoryId = 1;
 
-        given(categoryService.findById(categoryId)).willReturn(categoryResponseBebidas);
+        given(categoryService.findById(categoryId)).willReturn(bebidasGetResponse);
 
         // When
         ResultActions response = mockMvc.perform(get(url + "/get/{id}", 1));
@@ -373,11 +365,11 @@ public class CategoryControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].name",
                         CoreMatchers.is("Bebidas")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].subcategories[0].name",
-                        CoreMatchers.is("Agua mineral")));
+                        CoreMatchers.is("Agua natural")));
     }
 
     @Test
-    public void findById_NonExistingCategory_Return_IsNotFound() throws Exception {
+    public void get_NonExistingCategory_Return_IsNotFound() throws Exception {
         //Given
         given(categoryService.findById(anyInt()))
                 .willThrow(new DataNotFoundException("Category not found!"));
@@ -392,7 +384,7 @@ public class CategoryControllerTest {
     }
 
     @Test
-    public void findById_StringId_Return_IsInternalServerError() throws Exception {
+    public void get_StringId_Return_IsInternalServerError() throws Exception {
         // When
         ResultActions response = mockMvc.perform(get(url + "/get/{id}", "one"));
 
@@ -403,13 +395,13 @@ public class CategoryControllerTest {
     @Test
     public void save_NonExistingCategory_Return_IsCreated() throws Exception {
         // Given
-        given(categoryService.save(categorySaveRequestVinos))
-                .willReturn(categorySavedResponseVinos);
+        given(categoryService.save(vinosSaveRequest))
+                .willReturn(vinosSavedResponse);
 
         // When
         ResultActions response = mockMvc.perform(post(url + "/save")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(categorySaveRequestVinos)));
+                .content(objectMapper.writeValueAsString(vinosSaveRequest)));
 
         // Then
         response.andExpect(MockMvcResultMatchers.status().isCreated())
@@ -423,13 +415,13 @@ public class CategoryControllerTest {
     @Test
     public void save_ExistingCategory_Return_Conflict() throws Exception {
         // Given
-        given(categoryService.save(any(CategorySaveRequestDto.class)))
+        given(categoryService.save(any(CategoryGenericRequestDto.class)))
                 .willThrow(new DataAlreadyExistsException("Category already exists!"));
 
         // When
         ResultActions response = mockMvc.perform(post(url + "/save")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(categorySaveRequestVinos)));
+                .content(objectMapper.writeValueAsString(vinosSaveRequest)));
 
         // Then
         response.andExpect(MockMvcResultMatchers.status().isConflict())
@@ -442,13 +434,13 @@ public class CategoryControllerTest {
         // Given
         Integer categoryId = 5;
 
-        given(categoryService.update(categoryId, categoryUpdateRequestVinos))
-                .willReturn(categoryUpdatedResponseVinos);
+        given(categoryService.update(categoryId, vinosUpdateRequest))
+                .willReturn(vinosUpdatedResponse);
 
         // When
         ResultActions response = mockMvc.perform(put(url + "/update/{id}", 5)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(categoryUpdateRequestVinos)));
+                .content(objectMapper.writeValueAsString(vinosUpdateRequest)));
 
         // Then
         response.andExpect(MockMvcResultMatchers.status().isOk())
@@ -462,13 +454,13 @@ public class CategoryControllerTest {
     @Test
     public void update_NonExistingCategory_Return_IsNotFound() throws Exception {
         // Given
-        given(categoryService.update(anyInt(), any(CategorySaveRequestDto.class)))
+        given(categoryService.update(anyInt(), any(CategoryGenericRequestDto.class)))
                 .willThrow(new DataNotFoundException("Category does not exist!"));
 
         // When
         ResultActions response = mockMvc.perform(put(url + "/update/{id}", 100)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(categoryUpdateRequestVinos)));
+                .content(objectMapper.writeValueAsString(vinosUpdateRequest)));
 
         // Then
         response.andExpect(MockMvcResultMatchers.status().isNotFound())
@@ -477,7 +469,7 @@ public class CategoryControllerTest {
     }
 
     @Test
-    public void deleteById_Category_Return_IsOk() throws Exception {
+    public void delete_Category_Return_IsOk() throws Exception {
         // Given
         willDoNothing().given(categoryService).deleteById(anyInt());
 
@@ -490,8 +482,9 @@ public class CategoryControllerTest {
                         CoreMatchers.is("Deleted category!")));
     }
 
-    private static CategorySaveResponseDto mapRequestDtoToResponseDto(Integer id, CategorySaveRequestDto request) {
-        return CategorySaveResponseDto.builder()
+    private static CategoryGenericResponseDto mapRequestDtoToResponseDto(
+            Integer id, CategoryGenericRequestDto request) {
+        return CategoryGenericResponseDto.builder()
                 .id(id)
                 .name(request.getName())
                 .description(request.getDescription())

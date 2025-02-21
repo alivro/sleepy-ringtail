@@ -11,7 +11,7 @@
 
     <groupId>com.alivro.spring</groupId>
     <artifactId>sleepyringtail</artifactId>
-    <version>0.3.0</version>
+    <version>0.3.1</version>
     <name>Sleepy Ringtail</name>
     <description>Stores the Sleepy Ringtail</description>
     <packaging>jar</packaging>
@@ -65,6 +65,13 @@
             <artifactId>lombok</artifactId>
             <version>1.18.36</version>
             <scope>provided</scope>
+        </dependency>
+
+        <!-- ModelMapper -->
+        <dependency>
+            <groupId>org.modelmapper</groupId>
+            <artifactId>modelmapper</artifactId>
+            <version>3.2.2</version>
         </dependency>
 
         <!-- PostgreSQL -->

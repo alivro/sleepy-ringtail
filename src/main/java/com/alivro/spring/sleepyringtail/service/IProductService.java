@@ -1,8 +1,8 @@
 package com.alivro.spring.sleepyringtail.service;
 
 import com.alivro.spring.sleepyringtail.model.Product;
-import com.alivro.spring.sleepyringtail.model.product.request.ProductSaveRequestDto;
-import com.alivro.spring.sleepyringtail.model.product.response.ProductResponseDto;
+import com.alivro.spring.sleepyringtail.model.product.request.ProductGenericRequestDto;
+import com.alivro.spring.sleepyringtail.model.product.response.ProductGenericResponseDto;
 import com.alivro.spring.sleepyringtail.util.pagination.CustomPaginationData;
 import org.springframework.data.domain.Pageable;
 
@@ -12,7 +12,7 @@ public interface IProductService {
      *
      * @return Información de todos los productos
      */
-    CustomPaginationData<ProductResponseDto, Product> findAll(Pageable pageable);
+    CustomPaginationData<ProductGenericResponseDto, Product> findAll(Pageable pageable);
 
     /**
      * Método para buscar los productos que contengan una palabra dada en su nombre
@@ -21,7 +21,7 @@ public interface IProductService {
      * @param pageable Información de paginación
      * @return Información de los productos que cumplen con el criterio de búsqueda
      */
-    CustomPaginationData<ProductResponseDto, Product> findAllByName(String word, Pageable pageable);
+    CustomPaginationData<ProductGenericResponseDto, Product> findAllByName(String word, Pageable pageable);
 
     /**
      * Método para buscar los productos que contengan una palabra dada en su descripción
@@ -30,7 +30,7 @@ public interface IProductService {
      * @param pageable Información de paginación
      * @return Información de los productos que cumplen con el criterio de búsqueda
      */
-    CustomPaginationData<ProductResponseDto, Product> findAllByDescription(String word, Pageable pageable);
+    CustomPaginationData<ProductGenericResponseDto, Product> findAllByDescription(String word, Pageable pageable);
 
     /**
      * Método para buscar un producto por su ID
@@ -38,7 +38,7 @@ public interface IProductService {
      * @param id Identificador único del producto
      * @return Información del producto buscado
      */
-    ProductResponseDto findById(Integer id);
+    ProductGenericResponseDto findById(Integer id);
 
     /**
      * Método para guardar un nuevo producto
@@ -46,7 +46,7 @@ public interface IProductService {
      * @param request Información del producto a guardar
      * @return Información del producto guardado
      */
-    ProductResponseDto save(ProductSaveRequestDto request);
+    ProductGenericResponseDto save(ProductGenericRequestDto request);
 
     /**
      * Método para actualizar la información de un producto
@@ -55,7 +55,7 @@ public interface IProductService {
      * @param request Información del producto a actualizar
      * @return Información del producto actualizado
      */
-    ProductResponseDto update(Integer id, ProductSaveRequestDto request);
+    ProductGenericResponseDto update(Integer id, ProductGenericRequestDto request);
 
     /**
      * Método para eliminar un producto por su ID

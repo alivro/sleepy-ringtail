@@ -1,9 +1,9 @@
 package com.alivro.spring.sleepyringtail.service;
 
 import com.alivro.spring.sleepyringtail.model.Subcategory;
-import com.alivro.spring.sleepyringtail.model.subcategory.request.SubcategorySaveRequestDto;
+import com.alivro.spring.sleepyringtail.model.subcategory.request.SubcategoryGenericRequestDto;
+import com.alivro.spring.sleepyringtail.model.subcategory.response.SubcategoryGenericResponseDto;
 import com.alivro.spring.sleepyringtail.model.subcategory.response.SubcategoryGetResponseDto;
-import com.alivro.spring.sleepyringtail.model.subcategory.response.SubcategorySaveResponseDto;
 import com.alivro.spring.sleepyringtail.util.pagination.CustomPaginationData;
 import org.springframework.data.domain.Pageable;
 
@@ -13,7 +13,7 @@ public interface ISubcategoryService {
      *
      * @return Información de todos las subcategorías
      */
-    CustomPaginationData<SubcategoryGetResponseDto, Subcategory> findAll(Pageable pageable);
+    CustomPaginationData<SubcategoryGenericResponseDto, Subcategory> findAll(Pageable pageable);
 
     /**
      * Método para buscar las subcategorías que contengan una palabra dada
@@ -22,7 +22,7 @@ public interface ISubcategoryService {
      * @param pageable Información de paginación
      * @return Información de las subcategorías que cumplen con el criterio de búsqueda
      */
-    CustomPaginationData<SubcategoryGetResponseDto, Subcategory> findAllByName(String word, Pageable pageable);
+    CustomPaginationData<SubcategoryGenericResponseDto, Subcategory> findAllByName(String word, Pageable pageable);
 
     /**
      * Método para buscar una subcategoría por su ID
@@ -38,7 +38,7 @@ public interface ISubcategoryService {
      * @param request Información de la subcategoría a guardar
      * @return Información de la subcategoría guardada
      */
-    SubcategorySaveResponseDto save(SubcategorySaveRequestDto request);
+    SubcategoryGenericResponseDto save(SubcategoryGenericRequestDto request);
 
     /**
      * Método para actualizar la información de una subcategoría
@@ -47,7 +47,7 @@ public interface ISubcategoryService {
      * @param request Información de la subcategoría a actualizar
      * @return Información de la subcategoría actualizada
      */
-    SubcategorySaveResponseDto update(Integer id, SubcategorySaveRequestDto request);
+    SubcategoryGenericResponseDto update(Integer id, SubcategoryGenericRequestDto request);
 
     /**
      * Método para eliminar una subcategoría por su ID

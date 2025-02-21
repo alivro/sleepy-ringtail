@@ -5,9 +5,9 @@ import com.alivro.spring.sleepyringtail.exception.DataAlreadyExistsException;
 import com.alivro.spring.sleepyringtail.exception.DataNotFoundException;
 import com.alivro.spring.sleepyringtail.model.Product;
 import com.alivro.spring.sleepyringtail.model.Subcategory;
-import com.alivro.spring.sleepyringtail.model.product.request.ProductSaveRequestDto;
-import com.alivro.spring.sleepyringtail.model.product.request.SubcategoryOfProductRequestDto;
-import com.alivro.spring.sleepyringtail.model.product.response.ProductResponseDto;
+import com.alivro.spring.sleepyringtail.model.product.request.ProductGenericRequestDto;
+import com.alivro.spring.sleepyringtail.model.product.response.ProductGenericResponseDto;
+import com.alivro.spring.sleepyringtail.model.util.request.SubcategoryRequestDto;
 import com.alivro.spring.sleepyringtail.util.pagination.CustomPageMetadata;
 import com.alivro.spring.sleepyringtail.util.pagination.CustomPaginationData;
 import org.hamcrest.MatcherAssert;
@@ -17,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -52,17 +53,19 @@ public class IProductServiceImplTest {
     private static Product vacaNapolitana;
 
     // Guardar un nuevo producto
-    private static ProductSaveRequestDto productSaveRequestVacaChocolate;
-    private static Product productToSaveVacaChocolate;
-    private static Product productSavedVacaChocolate;
+    private static ProductGenericRequestDto vacaCocolateSaveRequest;
+    private static Product vacaCocolateToSave;
+    private static Product vacaCocolateSaved;
 
     // Actualizar un producto existente
-    private static ProductSaveRequestDto productUpdateRequestVacaChocolate;
-    private static Product productToUpdateVacaChocolate;
-    private static Product productUpdatedVacaChocolate;
+    private static ProductGenericRequestDto vacaChocolateUpdateRequest;
+    private static Product vacaChocolateToUpdate;
+    private static Product vacaChocolateUpdated;
 
     @BeforeAll
     public static void setup() {
+        ModelMapper modelMapper = new ModelMapper();
+
         // Buscar todos los productos
         Subcategory aguaNatural = Subcategory.builder()
                 .id(1)
@@ -71,7 +74,7 @@ public class IProductServiceImplTest {
 
         Subcategory botanas = Subcategory.builder()
                 .id(2)
-                .name("Botanas")
+                .name("Papas fritas")
                 .build();
 
         Subcategory chocolate = Subcategory.builder()
@@ -125,37 +128,42 @@ public class IProductServiceImplTest {
                 .build();
 
         // Guardar un nuevo producto
-        SubcategoryOfProductRequestDto subcategoryOfProductRequestChocolate = SubcategoryOfProductRequestDto.builder()
-                .id(3)
-                .name("Chocolate")
+        SubcategoryRequestDto botanasRequest = SubcategoryRequestDto.builder()
+                .id(2)
+                .name("Papas fritas")
                 .build();
 
-        productSaveRequestVacaChocolate = ProductSaveRequestDto.builder()
-                .name("Vaca de chocolate")
+        vacaCocolateSaveRequest = ProductGenericRequestDto.builder()
+                .name("Vaca de Cocolate")
                 .description("Helado")
                 .size("500 ml")
                 .price(BigDecimal.valueOf(42.00))
                 .barcode("7506306417854")
-                .subcategory(subcategoryOfProductRequestChocolate)
+                .subcategory(botanasRequest)
                 .build();
 
-        productToSaveVacaChocolate = ProductSaveRequestDto.mapRequestDtoToEntity(productSaveRequestVacaChocolate);
+        vacaCocolateToSave = modelMapper.map(vacaCocolateSaveRequest, Product.class);
 
-        productSavedVacaChocolate = ProductSaveRequestDto.mapRequestDtoToEntity(5, productSaveRequestVacaChocolate);
+        vacaCocolateSaved = vacaCocolateToSave.toBuilder().id(5).build();
 
         // Actualizar un producto existente
-        productUpdateRequestVacaChocolate = ProductSaveRequestDto.builder()
+        SubcategoryRequestDto chocolateRequest = SubcategoryRequestDto.builder()
+                .id(4)
+                .name("Helado base leche")
+                .build();
+
+        vacaChocolateUpdateRequest = ProductGenericRequestDto.builder()
                 .name("Vaca de Chocolate")
                 .description("Helado sabor chocolate")
                 .size("1 L")
                 .price(BigDecimal.valueOf(52.00))
                 .barcode("7501130902095")
-                .subcategory(subcategoryOfProductRequestChocolate)
+                .subcategory(chocolateRequest)
                 .build();
 
-        productToUpdateVacaChocolate = ProductSaveRequestDto.mapRequestDtoToEntity(productUpdateRequestVacaChocolate);
+        vacaChocolateToUpdate = modelMapper.map(vacaChocolateUpdateRequest, Product.class);
 
-        productUpdatedVacaChocolate = ProductSaveRequestDto.mapRequestDtoToEntity(5, productUpdateRequestVacaChocolate);
+        vacaChocolateUpdated = vacaChocolateToUpdate.toBuilder().id(5).build();
     }
 
     @Test
@@ -180,12 +188,12 @@ public class IProductServiceImplTest {
         );
 
         // When
-        CustomPaginationData<ProductResponseDto, Product> productsData = productService.findAll(
+        CustomPaginationData<ProductGenericResponseDto, Product> productsData = productService.findAll(
                 PageRequest.of(0, 5, Sort.by("name").ascending())
         );
 
         // Then
-        List<ProductResponseDto> data = productsData.getData();
+        List<ProductGenericResponseDto> data = productsData.getData();
         CustomPageMetadata meta = productsData.getMetadata();
 
         assertThat(data.size()).isEqualTo(4);
@@ -218,12 +226,12 @@ public class IProductServiceImplTest {
         );
 
         // When
-        CustomPaginationData<ProductResponseDto, Product> productsData = productService.findAll(
+        CustomPaginationData<ProductGenericResponseDto, Product> productsData = productService.findAll(
                 PageRequest.of(0, 5, Sort.by("id").ascending())
         );
 
         // Then
-        List<ProductResponseDto> data = productsData.getData();
+        List<ProductGenericResponseDto> data = productsData.getData();
         CustomPageMetadata meta = productsData.getMetadata();
 
         assertThat(data.size()).isEqualTo(0);
@@ -256,13 +264,13 @@ public class IProductServiceImplTest {
         );
 
         // When
-        CustomPaginationData<ProductResponseDto, Product> productsData = productService.findAllByName(
+        CustomPaginationData<ProductGenericResponseDto, Product> productsData = productService.findAllByName(
                 "na",
                 PageRequest.of(0, 5, Sort.by("name").ascending())
         );
 
         // Then
-        List<ProductResponseDto> data = productsData.getData();
+        List<ProductGenericResponseDto> data = productsData.getData();
         CustomPageMetadata meta = productsData.getMetadata();
 
         assertThat(data.size()).isEqualTo(2);
@@ -294,13 +302,13 @@ public class IProductServiceImplTest {
         );
 
         // When
-        CustomPaginationData<ProductResponseDto, Product> productsData = productService.findAllByName(
+        CustomPaginationData<ProductGenericResponseDto, Product> productsData = productService.findAllByName(
                 "nu",
                 PageRequest.of(0, 5, Sort.by("id").ascending())
         );
 
         // Then
-        List<ProductResponseDto> data = productsData.getData();
+        List<ProductGenericResponseDto> data = productsData.getData();
         CustomPageMetadata meta = productsData.getMetadata();
 
         assertThat(data.size()).isEqualTo(0);
@@ -333,13 +341,13 @@ public class IProductServiceImplTest {
         );
 
         // When
-        CustomPaginationData<ProductResponseDto, Product> productsData = productService.findAllByDescription(
+        CustomPaginationData<ProductGenericResponseDto, Product> productsData = productService.findAllByDescription(
                 "ua",
                 PageRequest.of(0, 5, Sort.by("name").ascending())
         );
 
         // Then
-        List<ProductResponseDto> data = productsData.getData();
+        List<ProductGenericResponseDto> data = productsData.getData();
         CustomPageMetadata meta = productsData.getMetadata();
 
         assertThat(data.size()).isEqualTo(2);
@@ -373,13 +381,13 @@ public class IProductServiceImplTest {
         );
 
         // When
-        CustomPaginationData<ProductResponseDto, Product> productsData = productService.findAllByDescription(
+        CustomPaginationData<ProductGenericResponseDto, Product> productsData = productService.findAllByDescription(
                 "au",
                 PageRequest.of(0, 5, Sort.by("id").ascending())
         );
 
         // Then
-        List<ProductResponseDto> data = productsData.getData();
+        List<ProductGenericResponseDto> data = productsData.getData();
         CustomPageMetadata meta = productsData.getMetadata();
 
         assertThat(data.size()).isEqualTo(0);
@@ -399,7 +407,7 @@ public class IProductServiceImplTest {
         given(productDao.findById(productId)).willReturn(Optional.of(ardillasSaladas));
 
         // When
-        ProductResponseDto foundProduct = productService.findById(1);
+        ProductGenericResponseDto foundProduct = productService.findById(1);
 
         // Then
         assertThat(foundProduct).isNotNull();
@@ -407,6 +415,7 @@ public class IProductServiceImplTest {
         assertThat(foundProduct.getName()).isEqualTo("Ardillas Saladas");
         assertThat(foundProduct.getPrice()).isEqualTo(BigDecimal.valueOf(21.00));
         assertThat(foundProduct.getBarcode()).isEqualTo("7501030459941");
+        assertThat(foundProduct.getSubcategory().getName()).isEqualTo("Papas fritas");
     }
 
     @Test
@@ -425,19 +434,20 @@ public class IProductServiceImplTest {
     @Test
     public void save_NonExistingProduct_Return_SavedProduct() {
         // Given
-        given(productDao.existsByBarcode(productSaveRequestVacaChocolate.getBarcode())).willReturn(false);
-        given(productDao.save(productToSaveVacaChocolate)).willReturn(productSavedVacaChocolate);
+        given(productDao.existsByBarcode(vacaCocolateSaveRequest.getBarcode())).willReturn(false);
+        given(productDao.save(vacaCocolateToSave)).willReturn(vacaCocolateSaved);
 
         // When
-        ProductResponseDto savedProduct = productService.save(productSaveRequestVacaChocolate);
+        ProductGenericResponseDto savedProduct = productService.save(vacaCocolateSaveRequest);
 
         // Then
         assertThat(savedProduct).isNotNull();
-        assertThat(savedProduct.getName()).isEqualTo("Vaca de chocolate");
+        assertThat(savedProduct.getName()).isEqualTo("Vaca de Cocolate");
         assertThat(savedProduct.getDescription()).isEqualTo("Helado");
         assertThat(savedProduct.getSize()).isEqualTo("500 ml");
         assertThat(savedProduct.getPrice()).isEqualTo(BigDecimal.valueOf(42.00));
         assertThat(savedProduct.getBarcode()).isEqualTo("7506306417854");
+        assertThat(savedProduct.getSubcategory().getName()).isEqualTo("Papas fritas");
     }
 
     @Test
@@ -447,7 +457,7 @@ public class IProductServiceImplTest {
 
         // When
         Throwable thrown = assertThrows(DataAlreadyExistsException.class,
-                () -> productService.save(productSaveRequestVacaChocolate));
+                () -> productService.save(vacaCocolateSaveRequest));
 
         // Then
         MatcherAssert.assertThat(thrown.getMessage(), is("Product already exists!"));
@@ -458,11 +468,11 @@ public class IProductServiceImplTest {
         // Given
         Integer productId = 5;
 
-        given(productDao.findById(productId)).willReturn(Optional.ofNullable(productToUpdateVacaChocolate));
-        given(productDao.save(productToUpdateVacaChocolate)).willReturn(productUpdatedVacaChocolate);
+        given(productDao.findById(productId)).willReturn(Optional.ofNullable(vacaChocolateToUpdate));
+        given(productDao.save(vacaChocolateToUpdate)).willReturn(vacaChocolateUpdated);
 
         // When
-        ProductResponseDto updatedProduct = productService.update(5, productUpdateRequestVacaChocolate);
+        ProductGenericResponseDto updatedProduct = productService.update(5, vacaChocolateUpdateRequest);
 
         // Then
         assertThat(updatedProduct).isNotNull();
@@ -472,6 +482,7 @@ public class IProductServiceImplTest {
         assertThat(updatedProduct.getSize()).isEqualTo("1 L");
         assertThat(updatedProduct.getPrice()).isEqualTo(BigDecimal.valueOf(52.00));
         assertThat(updatedProduct.getBarcode()).isEqualTo("7501130902095");
+        assertThat(updatedProduct.getSubcategory().getName()).isEqualTo("Helado base leche");
     }
 
     @Test
@@ -481,7 +492,7 @@ public class IProductServiceImplTest {
 
         // When
         Throwable thrown = assertThrows(DataNotFoundException.class,
-                () -> productService.update(100, productUpdateRequestVacaChocolate));
+                () -> productService.update(100, vacaChocolateUpdateRequest));
 
         // Then
         MatcherAssert.assertThat(thrown.getMessage(), is("Product does not exist!"));

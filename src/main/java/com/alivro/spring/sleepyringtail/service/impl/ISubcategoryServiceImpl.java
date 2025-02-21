@@ -5,12 +5,12 @@ import com.alivro.spring.sleepyringtail.exception.DataAlreadyExistsException;
 import com.alivro.spring.sleepyringtail.exception.DataNotFoundException;
 import com.alivro.spring.sleepyringtail.model.Category;
 import com.alivro.spring.sleepyringtail.model.Subcategory;
-import com.alivro.spring.sleepyringtail.model.subcategory.request.CategoryOfSubcategoryRequestDto;
-import com.alivro.spring.sleepyringtail.model.subcategory.request.SubcategorySaveRequestDto;
+import com.alivro.spring.sleepyringtail.model.subcategory.request.SubcategoryGenericRequestDto;
+import com.alivro.spring.sleepyringtail.model.subcategory.response.SubcategoryGenericResponseDto;
 import com.alivro.spring.sleepyringtail.model.subcategory.response.SubcategoryGetResponseDto;
-import com.alivro.spring.sleepyringtail.model.subcategory.response.SubcategorySaveResponseDto;
 import com.alivro.spring.sleepyringtail.service.ISubcategoryService;
 import com.alivro.spring.sleepyringtail.util.pagination.CustomPaginationData;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +24,7 @@ import java.util.Optional;
 @Service
 public class ISubcategoryServiceImpl implements ISubcategoryService {
     private final SubcategoryDao subcategoryDao;
+    private final ModelMapper modelMapper = new ModelMapper();
     private final Logger logger = LoggerFactory.getLogger(ISubcategoryServiceImpl.class);
 
     /**
@@ -42,14 +43,14 @@ public class ISubcategoryServiceImpl implements ISubcategoryService {
      * @return Información de todas las subcategorías
      */
     @Override
-    public CustomPaginationData<SubcategoryGetResponseDto, Subcategory> findAll(Pageable pageable) {
+    public CustomPaginationData<SubcategoryGenericResponseDto, Subcategory> findAll(Pageable pageable) {
         logger.info("Busca todas las subcategorías.");
 
         Page<Subcategory> subcategoriesPage = subcategoryDao.findAll(pageable);
 
         // Información de las subcategorías
-        List<SubcategoryGetResponseDto> foundSubcategories = subcategoriesPage.stream()
-                .map(SubcategoryGetResponseDto::mapEntityToResponseDto)
+        List<SubcategoryGenericResponseDto> foundSubcategories = subcategoriesPage.stream()
+                .map(subcategory -> modelMapper.map(subcategory, SubcategoryGenericResponseDto.class))
                 .toList();
 
         return new CustomPaginationData<>(foundSubcategories, subcategoriesPage);
@@ -63,14 +64,14 @@ public class ISubcategoryServiceImpl implements ISubcategoryService {
      * @return Información de las subcategorías que cumplen con el criterio de búsqueda
      */
     @Override
-    public CustomPaginationData<SubcategoryGetResponseDto, Subcategory> findAllByName(String word, Pageable pageable) {
+    public CustomPaginationData<SubcategoryGenericResponseDto, Subcategory> findAllByName(String word, Pageable pageable) {
         logger.info("Busca todas las subcategorías.");
 
         Page<Subcategory> subcategoriesPage = subcategoryDao.findByNameContainingIgnoreCase(word, pageable);
 
         // Información de las categorías
-        List<SubcategoryGetResponseDto> foundSubcategories = subcategoriesPage.stream()
-                .map(SubcategoryGetResponseDto::mapEntityToResponseDto)
+        List<SubcategoryGenericResponseDto> foundSubcategories = subcategoriesPage.stream()
+                .map(subcategory -> modelMapper.map(subcategory, SubcategoryGenericResponseDto.class))
                 .toList();
 
         return new CustomPaginationData<>(foundSubcategories, subcategoriesPage);
@@ -94,7 +95,7 @@ public class ISubcategoryServiceImpl implements ISubcategoryService {
             throw new DataNotFoundException("Subcategory not found!");
         }
 
-        return SubcategoryGetResponseDto.mapEntityToResponseDto(foundSubcategory.get());
+        return modelMapper.map(foundSubcategory.get(), SubcategoryGetResponseDto.class);
     }
 
     /**
@@ -104,7 +105,7 @@ public class ISubcategoryServiceImpl implements ISubcategoryService {
      * @return Información de la subcategoría guardada
      */
     @Override
-    public SubcategorySaveResponseDto save(SubcategorySaveRequestDto request) {
+    public SubcategoryGenericResponseDto save(SubcategoryGenericRequestDto request) {
         String name = request.getName();
 
         logger.info("Busca subcategoría. Nombre: {}", name);
@@ -122,10 +123,10 @@ public class ISubcategoryServiceImpl implements ISubcategoryService {
 
         // Guarda la información de la nueva subcategoría
         Subcategory savedSubcategory = subcategoryDao.save(
-                SubcategorySaveRequestDto.mapRequestDtoToEntity(request)
+                modelMapper.map(request, Subcategory.class)
         );
 
-        return SubcategorySaveResponseDto.mapEntityToResponseDto(savedSubcategory);
+        return modelMapper.map(savedSubcategory, SubcategoryGenericResponseDto.class);
     }
 
     /**
@@ -136,7 +137,7 @@ public class ISubcategoryServiceImpl implements ISubcategoryService {
      * @return Información de la subcategoría actualizada
      */
     @Override
-    public SubcategorySaveResponseDto update(Integer id, SubcategorySaveRequestDto request) {
+    public SubcategoryGenericResponseDto update(Integer id, SubcategoryGenericRequestDto request) {
         logger.info("Busca subcategoría. ID: {}", id);
 
         Optional<Subcategory> foundSubcategory = subcategoryDao.findById(id);
@@ -151,8 +152,8 @@ public class ISubcategoryServiceImpl implements ISubcategoryService {
 
         // Información de la subcategoría a actualizar
         Subcategory categoryToUpdate = foundSubcategory.get();
-        Category category = CategoryOfSubcategoryRequestDto
-                .mapRequestDtoToEntity(request.getCategory());
+        Category category = modelMapper.map(request.getCategory(), Category.class);
+
         categoryToUpdate.setName(request.getName());
         categoryToUpdate.setDescription(request.getDescription());
         categoryToUpdate.setCategory(category);
@@ -162,7 +163,7 @@ public class ISubcategoryServiceImpl implements ISubcategoryService {
         // Actualiza la información de la subcategoría
         Subcategory updatedSubcategory = subcategoryDao.save(categoryToUpdate);
 
-        return SubcategorySaveResponseDto.mapEntityToResponseDto(updatedSubcategory);
+        return modelMapper.map(updatedSubcategory, SubcategoryGenericResponseDto.class);
     }
 
     /**

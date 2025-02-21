@@ -2,8 +2,8 @@ package com.alivro.spring.sleepyringtail.controller;
 
 import com.alivro.spring.sleepyringtail.handler.ResponseHandler;
 import com.alivro.spring.sleepyringtail.model.Product;
-import com.alivro.spring.sleepyringtail.model.product.request.ProductSaveRequestDto;
-import com.alivro.spring.sleepyringtail.model.product.response.ProductResponseDto;
+import com.alivro.spring.sleepyringtail.model.product.request.ProductGenericRequestDto;
+import com.alivro.spring.sleepyringtail.model.product.response.ProductGenericResponseDto;
 import com.alivro.spring.sleepyringtail.service.IProductService;
 import com.alivro.spring.sleepyringtail.util.pagination.CustomPageMetadata;
 import com.alivro.spring.sleepyringtail.util.pagination.CustomPaginationData;
@@ -42,10 +42,10 @@ public class ProductController {
      * @return Información de todos los productos
      */
     @GetMapping("/getAll")
-    public ResponseEntity<CustomResponse<ProductResponseDto, CustomPageMetadata>> getAllProducts(
+    public ResponseEntity<CustomResponse<ProductGenericResponseDto, CustomPageMetadata>> getAllProducts(
             @PageableDefault(page = 0, size = 5, sort = "id", direction = Sort.Direction.ASC)
             Pageable pageable) {
-        CustomPaginationData<ProductResponseDto, Product> productsData = productService.findAll(pageable);
+        CustomPaginationData<ProductGenericResponseDto, Product> productsData = productService.findAll(pageable);
 
         logger.info("Productos encontrados.");
 
@@ -62,11 +62,11 @@ public class ProductController {
      * @return Información de todos los productos que cumplen con el criterio de búsqueda
      */
     @GetMapping("/getAllByName/{word}")
-    public ResponseEntity<CustomResponse<ProductResponseDto, CustomPageMetadata>> getAllProductsByName(
+    public ResponseEntity<CustomResponse<ProductGenericResponseDto, CustomPageMetadata>> getAllProductsByName(
             @PathVariable("word") String word,
             @PageableDefault(page = 0, size = 5, sort = "id", direction = Sort.Direction.ASC)
             Pageable pageable) {
-        CustomPaginationData<ProductResponseDto, Product> productsData =
+        CustomPaginationData<ProductGenericResponseDto, Product> productsData =
                 productService.findAllByName(word, pageable);
 
         logger.info("Productos encontrados.");
@@ -84,11 +84,11 @@ public class ProductController {
      * @return Información de todos los productos que cumplen con el criterio de búsqueda
      */
     @GetMapping("/getAllByDescription/{word}")
-    public ResponseEntity<CustomResponse<ProductResponseDto, CustomPageMetadata>> getAllProductsByDescription(
+    public ResponseEntity<CustomResponse<ProductGenericResponseDto, CustomPageMetadata>> getAllProductsByDescription(
             @PathVariable("word") String word,
             @PageableDefault(page = 0, size = 5, sort = "id", direction = Sort.Direction.ASC)
             Pageable pageable) {
-        CustomPaginationData<ProductResponseDto, Product> productsData =
+        CustomPaginationData<ProductGenericResponseDto, Product> productsData =
                 productService.findAllByDescription(word, pageable);
 
         logger.info("Productos encontrados.");
@@ -105,8 +105,8 @@ public class ProductController {
      * @return Información del producto buscado
      */
     @GetMapping("/get/{id}")
-    public ResponseEntity<CustomResponse<ProductResponseDto, Void>> getProduct(@PathVariable("id") Integer id) {
-        ProductResponseDto foundProduct = productService.findById(id);
+    public ResponseEntity<CustomResponse<ProductGenericResponseDto, Void>> getProduct(@PathVariable("id") Integer id) {
+        ProductGenericResponseDto foundProduct = productService.findById(id);
 
         logger.info("Producto encontrado. ID: {}", id);
 
@@ -122,9 +122,9 @@ public class ProductController {
      * @return Información del producto guardado
      */
     @PostMapping("/save")
-    public ResponseEntity<CustomResponse<ProductResponseDto, Void>> saveProduct(
-            @Valid @RequestBody ProductSaveRequestDto request) {
-        ProductResponseDto savedProduct = productService.save(request);
+    public ResponseEntity<CustomResponse<ProductGenericResponseDto, Void>> saveProduct(
+            @Valid @RequestBody ProductGenericRequestDto request) {
+        ProductGenericResponseDto savedProduct = productService.save(request);
 
         logger.info("Producto guardado. ID: {}", savedProduct.getId());
 
@@ -141,9 +141,9 @@ public class ProductController {
      * @return Información del producto actualizado
      */
     @PutMapping("/update/{id}")
-    public ResponseEntity<CustomResponse<ProductResponseDto, Void>> updateProduct(
-            @PathVariable("id") Integer id, @Valid @RequestBody ProductSaveRequestDto request) {
-        ProductResponseDto updatedProduct = productService.update(id, request);
+    public ResponseEntity<CustomResponse<ProductGenericResponseDto, Void>> updateProduct(
+            @PathVariable("id") Integer id, @Valid @RequestBody ProductGenericRequestDto request) {
+        ProductGenericResponseDto updatedProduct = productService.update(id, request);
 
         logger.info("Producto actualizado. ID: {}", id);
 

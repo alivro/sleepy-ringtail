@@ -2,9 +2,9 @@ package com.alivro.spring.sleepyringtail.controller;
 
 import com.alivro.spring.sleepyringtail.handler.ResponseHandler;
 import com.alivro.spring.sleepyringtail.model.Category;
-import com.alivro.spring.sleepyringtail.model.category.request.CategorySaveRequestDto;
+import com.alivro.spring.sleepyringtail.model.category.request.CategoryGenericRequestDto;
+import com.alivro.spring.sleepyringtail.model.category.response.CategoryGenericResponseDto;
 import com.alivro.spring.sleepyringtail.model.category.response.CategoryGetResponseDto;
-import com.alivro.spring.sleepyringtail.model.category.response.CategorySaveResponseDto;
 import com.alivro.spring.sleepyringtail.service.ICategoryService;
 import com.alivro.spring.sleepyringtail.util.pagination.CustomPageMetadata;
 import com.alivro.spring.sleepyringtail.util.pagination.CustomPaginationData;
@@ -43,10 +43,11 @@ public class CategoryController {
      * @return Información de todas las categorías
      */
     @GetMapping("/getAll")
-    public ResponseEntity<CustomResponse<CategoryGetResponseDto, CustomPageMetadata>> getAllCategories(
+    public ResponseEntity<CustomResponse<CategoryGenericResponseDto, CustomPageMetadata>> getAllCategories(
             @PageableDefault(page = 0, size = 5, sort = "id", direction = Sort.Direction.ASC)
             Pageable pageable) {
-        CustomPaginationData<CategoryGetResponseDto, Category> categoriesData = categoryService.findAll(pageable);
+        CustomPaginationData<CategoryGenericResponseDto, Category> categoriesData =
+                categoryService.findAll(pageable);
 
         logger.info("Categorías encontradas.");
 
@@ -63,11 +64,12 @@ public class CategoryController {
      * @return Información de todas las categorías que cumplen con el criterio de búsqueda
      */
     @GetMapping("/getAllByName/{word}")
-    public ResponseEntity<CustomResponse<CategoryGetResponseDto, CustomPageMetadata>> getAllCategoriesByName(
+    public ResponseEntity<CustomResponse<CategoryGenericResponseDto, CustomPageMetadata>> getAllCategoriesByName(
             @PathVariable("word") String word,
             @PageableDefault(page = 0, size = 5, sort = "id", direction = Sort.Direction.ASC)
             Pageable pageable) {
-        CustomPaginationData<CategoryGetResponseDto, Category> categoriesData = categoryService.findAllByName(word, pageable);
+        CustomPaginationData<CategoryGenericResponseDto, Category> categoriesData =
+                categoryService.findAllByName(word, pageable);
 
         logger.info("Categorías encontradas.");
 
@@ -100,9 +102,9 @@ public class CategoryController {
      * @return Información de la categoría guardada
      */
     @PostMapping("/save")
-    public ResponseEntity<CustomResponse<CategorySaveResponseDto, Void>> saveCategory(
-            @Valid @RequestBody CategorySaveRequestDto request) {
-        CategorySaveResponseDto savedCategory = categoryService.save(request);
+    public ResponseEntity<CustomResponse<CategoryGenericResponseDto, Void>> saveCategory(
+            @Valid @RequestBody CategoryGenericRequestDto request) {
+        CategoryGenericResponseDto savedCategory = categoryService.save(request);
 
         logger.info("Categoría guardada. ID: {}", savedCategory.getId());
 
@@ -119,9 +121,9 @@ public class CategoryController {
      * @return Información de la categoría actualizada
      */
     @PutMapping("/update/{id}")
-    public ResponseEntity<CustomResponse<CategorySaveResponseDto, Void>> updateCategory(
-            @PathVariable("id") Integer id, @Valid @RequestBody CategorySaveRequestDto request) {
-        CategorySaveResponseDto updatedCategory = categoryService.update(id, request);
+    public ResponseEntity<CustomResponse<CategoryGenericResponseDto, Void>> updateCategory(
+            @PathVariable("id") Integer id, @Valid @RequestBody CategoryGenericRequestDto request) {
+        CategoryGenericResponseDto updatedCategory = categoryService.update(id, request);
 
         logger.info("Categoría actualizada. ID: {}", id);
 

@@ -3,10 +3,10 @@ package com.alivro.spring.sleepyringtail.controller;
 import com.alivro.spring.sleepyringtail.exception.DataAlreadyExistsException;
 import com.alivro.spring.sleepyringtail.exception.DataNotFoundException;
 import com.alivro.spring.sleepyringtail.model.Product;
-import com.alivro.spring.sleepyringtail.model.product.request.ProductSaveRequestDto;
-import com.alivro.spring.sleepyringtail.model.product.request.SubcategoryOfProductRequestDto;
-import com.alivro.spring.sleepyringtail.model.product.response.ProductResponseDto;
-import com.alivro.spring.sleepyringtail.model.product.response.SubcategoryOfProductResponseDto;
+import com.alivro.spring.sleepyringtail.model.util.response.SubcategoryResponseDto;
+import com.alivro.spring.sleepyringtail.model.product.request.ProductGenericRequestDto;
+import com.alivro.spring.sleepyringtail.model.util.request.SubcategoryRequestDto;
+import com.alivro.spring.sleepyringtail.model.product.response.ProductGenericResponseDto;
 import com.alivro.spring.sleepyringtail.service.IProductService;
 import com.alivro.spring.sleepyringtail.util.pagination.CustomPageMetadata;
 import com.alivro.spring.sleepyringtail.util.pagination.CustomPaginationData;
@@ -55,114 +55,119 @@ public class ProductControllerTest {
     private static final String url = "/api/v1/product";
 
     // Buscar todos los productos
-    private static ProductResponseDto productResponseArdillasSaladas;
-    private static ProductResponseDto productResponseEstrellaMarina;
-    private static ProductResponseDto productResponseOsoAlmendrado;
-    private static ProductResponseDto productResponseVacaNapolitana;
+    private static ProductGenericResponseDto ardillasSaladasResponse;
+    private static ProductGenericResponseDto estrellaMarinaResponse;
+    private static ProductGenericResponseDto osoAlmendradoResponse;
+    private static ProductGenericResponseDto vacaNapolitanaResponse;
 
     // Guardar un nuevo producto
-    private static ProductSaveRequestDto productSaveRequestVacaChocolate;
-    private static ProductResponseDto productSavedResponseVacaChocolate;
+    private static ProductGenericRequestDto vacaCocolateSaveRequest;
+    private static ProductGenericResponseDto vacaCocolateSavedResponse;
 
     // Actualizar un producto existente
-    private static ProductSaveRequestDto productUpdateRequestVacaChocolate;
-    private static ProductResponseDto productUpdatedResponseVacaChocolate;
+    private static ProductGenericRequestDto vacaChocolateUpdateRequest;
+    private static ProductGenericResponseDto vacaChocolateUpdatedResponse;
 
     @BeforeAll
     public static void setup() {
         // Buscar todos los productos
-        SubcategoryOfProductResponseDto aguaNatural = SubcategoryOfProductResponseDto.builder()
+        SubcategoryResponseDto aguaNaturalResponse = SubcategoryResponseDto.builder()
                 .id(1)
                 .name("Agua natural")
                 .build();
 
-        SubcategoryOfProductResponseDto botanas = SubcategoryOfProductResponseDto.builder()
+        SubcategoryResponseDto botanasResponse = SubcategoryResponseDto.builder()
                 .id(2)
                 .name("Botanas")
                 .build();
 
-        SubcategoryOfProductResponseDto chocolate = SubcategoryOfProductResponseDto.builder()
+        SubcategoryResponseDto chocolateResponse = SubcategoryResponseDto.builder()
                 .id(3)
                 .name("Chocolate")
                 .build();
 
-        SubcategoryOfProductResponseDto heladoLeche = SubcategoryOfProductResponseDto.builder()
+        SubcategoryResponseDto heladoLecheResponse = SubcategoryResponseDto.builder()
                 .id(4)
                 .name("Helado base leche")
                 .build();
 
-        productResponseArdillasSaladas = ProductResponseDto.builder()
+        ardillasSaladasResponse = ProductGenericResponseDto.builder()
                 .id(1)
                 .name("Ardillas Saladas")
                 .description("Cacahuates salados")
                 .size("60 g")
                 .price(BigDecimal.valueOf(21.00))
                 .barcode("7501030459941")
-                .subcategory(botanas)
+                .subcategory(botanasResponse)
                 .build();
 
-        productResponseEstrellaMarina = ProductResponseDto.builder()
+        estrellaMarinaResponse = ProductGenericResponseDto.builder()
                 .id(2)
                 .name("Estrella Marina")
                 .description("Agua embotellada")
                 .size("1 L")
                 .price(BigDecimal.valueOf(14.00))
                 .barcode("7501086801046")
-                .subcategory(aguaNatural)
+                .subcategory(aguaNaturalResponse)
                 .build();
 
-        productResponseOsoAlmendrado = ProductResponseDto.builder()
+        osoAlmendradoResponse = ProductGenericResponseDto.builder()
                 .id(3)
                 .name("Oso Almendrado")
                 .description("Barra de chocolate con leche y almendras")
                 .size("40 g")
                 .price(BigDecimal.valueOf(36.00))
                 .barcode("7501024544295")
-                .subcategory(chocolate)
+                .subcategory(chocolateResponse)
                 .build();
 
-        productResponseVacaNapolitana = ProductResponseDto.builder()
+        vacaNapolitanaResponse = ProductGenericResponseDto.builder()
                 .id(4)
                 .name("Vaca Napolitana")
                 .description("Helado sabor napolitano")
                 .size("1 L")
                 .price(BigDecimal.valueOf(45.00))
                 .barcode("7501130902194")
-                .subcategory(heladoLeche)
+                .subcategory(heladoLecheResponse)
                 .build();
 
         // Guardar un nuevo producto
-        SubcategoryOfProductRequestDto subcategoryOfProductRequestChocolate = SubcategoryOfProductRequestDto.builder()
-                .id(3)
-                .name("Dulces")
+        SubcategoryRequestDto botanasRequest = SubcategoryRequestDto.builder()
+                .id(2)
+                .name("Botanas")
                 .build();
 
-        productSaveRequestVacaChocolate = ProductSaveRequestDto.builder()
-                .name("Vaca de chocolate")
+        vacaCocolateSaveRequest = ProductGenericRequestDto.builder()
+                .name("Vaca de Cocolate")
                 .description("Helado")
                 .size("500 ml")
                 .price(BigDecimal.valueOf(42.00))
                 .barcode("7506306417854")
-                .subcategory(subcategoryOfProductRequestChocolate)
+                .subcategory(botanasRequest)
                 .build();
 
-        productSavedResponseVacaChocolate = mapRequestDtoToResponseDto(5, productSaveRequestVacaChocolate);
+        vacaCocolateSavedResponse = mapRequestDtoToResponseDto(5, vacaCocolateSaveRequest);
 
         // Actualizar un producto existente
-        productUpdateRequestVacaChocolate = ProductSaveRequestDto.builder()
+        SubcategoryRequestDto chocolateRequest = SubcategoryRequestDto.builder()
+                .id(3)
+                .name("Dulces")
+                .build();
+
+        vacaChocolateUpdateRequest = ProductGenericRequestDto.builder()
                 .name("Vaca de Chocolate")
                 .description("Helado sabor chocolate")
                 .size("1 L")
                 .price(BigDecimal.valueOf(52.00))
                 .barcode("7501130902095")
-                .subcategory(subcategoryOfProductRequestChocolate)
+                .subcategory(chocolateRequest)
                 .build();
 
-        productUpdatedResponseVacaChocolate = mapRequestDtoToResponseDto(5, productUpdateRequestVacaChocolate);
+        vacaChocolateUpdatedResponse = mapRequestDtoToResponseDto(5, vacaChocolateUpdateRequest);
     }
 
     @Test
-    public void getAllByNameAsc_ExistingProducts_Return_IsOk() throws Exception {
+    public void getAll_OrderByNameAsc_ExistingProducts_Return_IsOk() throws Exception {
         //Given
         int pageNumber = 0;
         int pageSize = 5;
@@ -171,11 +176,11 @@ public class ProductControllerTest {
                 .withPage(pageNumber)
                 .withSort(Sort.by(sortBy).ascending());
 
-        List<ProductResponseDto> foundProducts = new ArrayList<>();
-        foundProducts.add(productResponseArdillasSaladas);
-        foundProducts.add(productResponseEstrellaMarina);
-        foundProducts.add(productResponseOsoAlmendrado);
-        foundProducts.add(productResponseVacaNapolitana);
+        List<ProductGenericResponseDto> foundProducts = new ArrayList<>();
+        foundProducts.add(ardillasSaladasResponse);
+        foundProducts.add(estrellaMarinaResponse);
+        foundProducts.add(osoAlmendradoResponse);
+        foundProducts.add(vacaNapolitanaResponse);
 
         CustomPageMetadata metadata = CustomPageMetadata.builder()
                 .pageNumber(pageNumber)
@@ -186,7 +191,7 @@ public class ProductControllerTest {
                 .build();
 
         given(productService.findAll(pageable)).willReturn(
-                CustomPaginationData.<ProductResponseDto, Product>builder()
+                CustomPaginationData.<ProductGenericResponseDto, Product>builder()
                         .data(foundProducts)
                         .metadata(metadata)
                         .build()
@@ -236,7 +241,7 @@ public class ProductControllerTest {
                 .withPage(pageNumber)
                 .withSort(Sort.by(sortBy).ascending());
 
-        List<ProductResponseDto> foundProducts = new ArrayList<>();
+        List<ProductGenericResponseDto> foundProducts = new ArrayList<>();
 
         CustomPageMetadata metadata = CustomPageMetadata.builder()
                 .pageNumber(pageNumber)
@@ -247,7 +252,7 @@ public class ProductControllerTest {
                 .build();
 
         given(productService.findAll(pageable)).willReturn(
-                CustomPaginationData.<ProductResponseDto, Product>builder()
+                CustomPaginationData.<ProductGenericResponseDto, Product>builder()
                         .data(foundProducts)
                         .metadata(metadata)
                         .build()
@@ -286,9 +291,9 @@ public class ProductControllerTest {
                 .withPage(pageNumber)
                 .withSort(Sort.by(sortBy).ascending());
 
-        List<ProductResponseDto> foundProducts = new ArrayList<>();
-        foundProducts.add(productResponseEstrellaMarina);
-        foundProducts.add(productResponseVacaNapolitana);
+        List<ProductGenericResponseDto> foundProducts = new ArrayList<>();
+        foundProducts.add(estrellaMarinaResponse);
+        foundProducts.add(vacaNapolitanaResponse);
 
         CustomPageMetadata metadata = CustomPageMetadata.builder()
                 .pageNumber(pageNumber)
@@ -299,7 +304,7 @@ public class ProductControllerTest {
                 .build();
 
         given(productService.findAllByName(word, pageable)).willReturn(
-                CustomPaginationData.<ProductResponseDto, Product>builder()
+                CustomPaginationData.<ProductGenericResponseDto, Product>builder()
                         .data(foundProducts)
                         .metadata(metadata)
                         .build()
@@ -346,7 +351,7 @@ public class ProductControllerTest {
                 .withPage(pageNumber)
                 .withSort(Sort.by(sortBy).ascending());
 
-        List<ProductResponseDto> foundProducts = new ArrayList<>();
+        List<ProductGenericResponseDto> foundProducts = new ArrayList<>();
 
         CustomPageMetadata metadata = CustomPageMetadata.builder()
                 .pageNumber(pageNumber)
@@ -357,7 +362,7 @@ public class ProductControllerTest {
                 .build();
 
         given(productService.findAllByName(word, pageable)).willReturn(
-                CustomPaginationData.<ProductResponseDto, Product>builder()
+                CustomPaginationData.<ProductGenericResponseDto, Product>builder()
                         .data(foundProducts)
                         .metadata(metadata)
                         .build()
@@ -396,9 +401,9 @@ public class ProductControllerTest {
                 .withPage(pageNumber)
                 .withSort(Sort.by(sortBy).ascending());
 
-        List<ProductResponseDto> foundProducts = new ArrayList<>();
-        foundProducts.add(productResponseArdillasSaladas);
-        foundProducts.add(productResponseEstrellaMarina);
+        List<ProductGenericResponseDto> foundProducts = new ArrayList<>();
+        foundProducts.add(ardillasSaladasResponse);
+        foundProducts.add(estrellaMarinaResponse);
 
         CustomPageMetadata metadata = CustomPageMetadata.builder()
                 .pageNumber(pageNumber)
@@ -409,7 +414,7 @@ public class ProductControllerTest {
                 .build();
 
         given(productService.findAllByDescription(word, pageable)).willReturn(
-                CustomPaginationData.<ProductResponseDto, Product>builder()
+                CustomPaginationData.<ProductGenericResponseDto, Product>builder()
                         .data(foundProducts)
                         .metadata(metadata)
                         .build()
@@ -460,7 +465,7 @@ public class ProductControllerTest {
                 .withPage(pageNumber)
                 .withSort(Sort.by(sortBy).ascending());
 
-        List<ProductResponseDto> foundProducts = new ArrayList<>();
+        List<ProductGenericResponseDto> foundProducts = new ArrayList<>();
 
         CustomPageMetadata metadata = CustomPageMetadata.builder()
                 .pageNumber(pageNumber)
@@ -471,7 +476,7 @@ public class ProductControllerTest {
                 .build();
 
         given(productService.findAllByDescription(word, pageable)).willReturn(
-                CustomPaginationData.<ProductResponseDto, Product>builder()
+                CustomPaginationData.<ProductGenericResponseDto, Product>builder()
                         .data(foundProducts)
                         .metadata(metadata)
                         .build()
@@ -500,11 +505,11 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void getById_ExistingProduct_Return_IsOk() throws Exception {
+    public void get_ExistingProduct_Return_IsOk() throws Exception {
         //Given
         Integer productId = 1;
 
-        given(productService.findById(productId)).willReturn(productResponseArdillasSaladas);
+        given(productService.findById(productId)).willReturn(ardillasSaladasResponse);
 
         // When
         ResultActions response = mockMvc.perform(get(url + "/get/{id}", 1));
@@ -525,7 +530,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void getById_NonExistingProduct_Return_IsNotFound() throws Exception {
+    public void get_NonExistingProduct_Return_IsNotFound() throws Exception {
         //Given
         Integer productId = 100;
 
@@ -542,7 +547,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void getById_StringId_Return_IsInternalServerError() throws Exception {
+    public void get_StringId_Return_IsInternalServerError() throws Exception {
         // When
         ResultActions response = mockMvc.perform(get(url + "/get/{id}", "one"));
 
@@ -553,13 +558,13 @@ public class ProductControllerTest {
     @Test
     public void save_NonExistingProduct_Return_IsCreated() throws Exception {
         // Given
-        given(productService.save(productSaveRequestVacaChocolate))
-                .willReturn(productSavedResponseVacaChocolate);
+        given(productService.save(vacaCocolateSaveRequest))
+                .willReturn(vacaCocolateSavedResponse);
 
         // When
         ResultActions response = mockMvc.perform(post(url + "/save")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(productSaveRequestVacaChocolate)));
+                .content(objectMapper.writeValueAsString(vacaCocolateSaveRequest)));
 
         // Then
         response.andExpect(MockMvcResultMatchers.status().isCreated())
@@ -567,7 +572,7 @@ public class ProductControllerTest {
                         CoreMatchers.is("Saved product!")));
 
         response.andExpect(MockMvcResultMatchers.jsonPath("$.data[0].name",
-                        CoreMatchers.is("Vaca de chocolate")))
+                        CoreMatchers.is("Vaca de Cocolate")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].description",
                         CoreMatchers.is("Helado")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].size",
@@ -575,19 +580,21 @@ public class ProductControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].price",
                         CoreMatchers.is(42.0)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].barcode",
-                        CoreMatchers.is("7506306417854")));
+                        CoreMatchers.is("7506306417854")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].subcategory.name",
+                        CoreMatchers.is("Botanas")));
     }
 
     @Test
     public void save_ExistingProduct_Return_Conflict() throws Exception {
         // Given
-        given(productService.save(any(ProductSaveRequestDto.class)))
+        given(productService.save(any(ProductGenericRequestDto.class)))
                 .willThrow(new DataAlreadyExistsException("Product already exists!"));
 
         // When
         ResultActions response = mockMvc.perform(post(url + "/save")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(productSaveRequestVacaChocolate)));
+                .content(objectMapper.writeValueAsString(vacaCocolateSaveRequest)));
 
         // Then
         response.andExpect(MockMvcResultMatchers.status().isConflict())
@@ -600,13 +607,13 @@ public class ProductControllerTest {
         // Given
         Integer productId = 5;
 
-        given(productService.update(productId, productUpdateRequestVacaChocolate))
-                .willReturn(productUpdatedResponseVacaChocolate);
+        given(productService.update(productId, vacaChocolateUpdateRequest))
+                .willReturn(vacaChocolateUpdatedResponse);
 
         // When
         ResultActions response = mockMvc.perform(put(url + "/update/{id}", 5)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(productUpdateRequestVacaChocolate)));
+                .content(objectMapper.writeValueAsString(vacaChocolateUpdateRequest)));
 
         // Then
         response.andExpect(MockMvcResultMatchers.status().isOk())
@@ -622,19 +629,21 @@ public class ProductControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].price",
                         CoreMatchers.is(52.0)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].barcode",
-                        CoreMatchers.is("7501130902095")));
+                        CoreMatchers.is("7501130902095")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].subcategory.name",
+                        CoreMatchers.is("Dulces")));
     }
 
     @Test
     public void update_NonExistingProduct_Return_IsNotFound() throws Exception {
         // Given
-        given(productService.update(anyInt(), any(ProductSaveRequestDto.class)))
+        given(productService.update(anyInt(), any(ProductGenericRequestDto.class)))
                 .willThrow(new DataNotFoundException("Product does not exist!"));
 
         // When
         ResultActions response = mockMvc.perform(put(url + "/update/{id}", 100)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(productUpdateRequestVacaChocolate)));
+                .content(objectMapper.writeValueAsString(vacaChocolateUpdateRequest)));
 
         // Then
         response.andExpect(MockMvcResultMatchers.status().isNotFound())
@@ -643,7 +652,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void deleteById_Product_Return_IsOk() throws Exception {
+    public void delete_Product_Return_IsOk() throws Exception {
         // Given
         willDoNothing().given(productService).deleteById(anyInt());
 
@@ -656,14 +665,20 @@ public class ProductControllerTest {
                         CoreMatchers.is("Deleted product!")));
     }
 
-    private static ProductResponseDto mapRequestDtoToResponseDto(Integer id, ProductSaveRequestDto request) {
-        return ProductResponseDto.builder()
+    private static ProductGenericResponseDto mapRequestDtoToResponseDto(Integer id, ProductGenericRequestDto request) {
+       SubcategoryResponseDto subcategoryResponse = SubcategoryResponseDto.builder()
+               .id(request.getSubcategory().getId())
+               .name(request.getSubcategory().getName())
+               .build();
+
+        return ProductGenericResponseDto.builder()
                 .id(id)
                 .name(request.getName())
                 .description(request.getDescription())
                 .size(request.getSize())
                 .price(request.getPrice())
                 .barcode(request.getBarcode())
+                .subcategory(subcategoryResponse)
                 .build();
     }
 }

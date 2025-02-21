@@ -6,10 +6,10 @@ import com.alivro.spring.sleepyringtail.exception.DataNotFoundException;
 import com.alivro.spring.sleepyringtail.model.Category;
 import com.alivro.spring.sleepyringtail.model.Product;
 import com.alivro.spring.sleepyringtail.model.Subcategory;
-import com.alivro.spring.sleepyringtail.model.subcategory.request.CategoryOfSubcategoryRequestDto;
-import com.alivro.spring.sleepyringtail.model.subcategory.request.SubcategorySaveRequestDto;
+import com.alivro.spring.sleepyringtail.model.subcategory.request.SubcategoryGenericRequestDto;
+import com.alivro.spring.sleepyringtail.model.subcategory.response.SubcategoryGenericResponseDto;
 import com.alivro.spring.sleepyringtail.model.subcategory.response.SubcategoryGetResponseDto;
-import com.alivro.spring.sleepyringtail.model.subcategory.response.SubcategorySaveResponseDto;
+import com.alivro.spring.sleepyringtail.model.util.request.CategoryRequestDto;
 import com.alivro.spring.sleepyringtail.util.pagination.CustomPageMetadata;
 import com.alivro.spring.sleepyringtail.util.pagination.CustomPaginationData;
 import org.hamcrest.MatcherAssert;
@@ -19,6 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -49,23 +50,25 @@ public class ISubcategoryServiceImplTest {
     private ISubcategoryServiceImpl subcategoryService;
 
     // Buscar todas las subcategorías
-    private static Subcategory aguaMineral;
+    private static Subcategory aguaNatural;
     private static Subcategory chocolate;
     private static Subcategory heladoLeche;
     private static Subcategory papasFritas;
 
     // Guardar una nueva subcategoría
-    private static SubcategorySaveRequestDto subcategorySaveRequestGomitas;
-    private static Subcategory subcategoryToSaveGomitas;
-    private static Subcategory subcategorySavedGomitas;
+    private static SubcategoryGenericRequestDto gomitasSaveRequest;
+    private static Subcategory gomitasToSave;
+    private static Subcategory gomitasSaved;
 
     // Actualizar una subcategoría existente
-    private static SubcategorySaveRequestDto subcategoryUpdateRequestGomitas;
-    private static Subcategory subcategoryToUpdateGomitas;
-    private static Subcategory subcategoryUpdatedGomitas;
+    private static SubcategoryGenericRequestDto gomitasUpdateRequest;
+    private static Subcategory gomitasToUpdate;
+    private static Subcategory gomitasUpdated;
 
     @BeforeAll
     public static void setup() {
+        ModelMapper modelMapper = new ModelMapper();
+
         // Buscar todas las subcategorías
         Category bebidas = Category.builder()
                 .id(1)
@@ -93,9 +96,9 @@ public class ISubcategoryServiceImplTest {
                 .price(BigDecimal.valueOf(14.00))
                 .build();
 
-        aguaMineral = Subcategory.builder()
+        aguaNatural = Subcategory.builder()
                 .id(1)
-                .name("Agua mineral")
+                .name("Agua natural")
                 .category(bebidas)
                 .products(Collections.singletonList(estrellaMarina))
                 .build();
@@ -122,29 +125,34 @@ public class ISubcategoryServiceImplTest {
                 .build();
 
         // Guardar una nueva subcategoría
-        CategoryOfSubcategoryRequestDto categoryOfSubcategoryRequestDulces = CategoryOfSubcategoryRequestDto.builder()
-                .id(4)
+        CategoryRequestDto botanasRequest = CategoryRequestDto.builder()
+                .id(2)
+                .name("Botanas")
+                .build();
+
+        gomitasSaveRequest = SubcategoryGenericRequestDto.builder()
+                .name("Gomitas")
+                .category(botanasRequest)
+                .build();
+
+        gomitasToSave = modelMapper.map(gomitasSaveRequest, Subcategory.class);
+
+        gomitasSaved = gomitasToSave.toBuilder().id(5).build();
+
+        // Actualizar una subcategoría existente
+        CategoryRequestDto dulcesRequest = CategoryRequestDto.builder()
+                .id(3)
                 .name("Dulces")
                 .build();
 
-        subcategorySaveRequestGomitas = SubcategorySaveRequestDto.builder()
-                .name("Gomitas")
-                .category(categoryOfSubcategoryRequestDulces)
-                .build();
-
-        subcategoryToSaveGomitas = SubcategorySaveRequestDto.mapRequestDtoToEntity(subcategorySaveRequestGomitas);
-
-        subcategorySavedGomitas = SubcategorySaveRequestDto.mapRequestDtoToEntity(5, subcategorySaveRequestGomitas);
-
-        // Actualizar una subcategoría existente
-        subcategoryUpdateRequestGomitas = SubcategorySaveRequestDto.builder()
+        gomitasUpdateRequest = SubcategoryGenericRequestDto.builder()
                 .name("Caramelos de goma")
-                .category(categoryOfSubcategoryRequestDulces)
+                .category(dulcesRequest)
                 .build();
 
-        subcategoryToUpdateGomitas = SubcategorySaveRequestDto.mapRequestDtoToEntity(subcategoryUpdateRequestGomitas);
+        gomitasToUpdate = modelMapper.map(gomitasUpdateRequest, Subcategory.class);
 
-        subcategoryUpdatedGomitas = SubcategorySaveRequestDto.mapRequestDtoToEntity(5, subcategoryUpdateRequestGomitas);
+        gomitasUpdated = gomitasToUpdate.toBuilder().id(5).build();
     }
 
     @Test
@@ -155,7 +163,7 @@ public class ISubcategoryServiceImplTest {
         String sortBy = "name";
 
         List<Subcategory> subcategories = new ArrayList<>();
-        subcategories.add(aguaMineral);
+        subcategories.add(aguaNatural);
         subcategories.add(chocolate);
         subcategories.add(heladoLeche);
         subcategories.add(papasFritas);
@@ -169,16 +177,16 @@ public class ISubcategoryServiceImplTest {
         );
 
         // When
-        CustomPaginationData<SubcategoryGetResponseDto, Subcategory> subcategoriesData = subcategoryService.findAll(
+        CustomPaginationData<SubcategoryGenericResponseDto, Subcategory> subcategoriesData = subcategoryService.findAll(
                 PageRequest.of(0, 5, Sort.by("name").ascending())
         );
 
         // Then
-        List<SubcategoryGetResponseDto> data = subcategoriesData.getData();
+        List<SubcategoryGenericResponseDto> data = subcategoriesData.getData();
         CustomPageMetadata meta = subcategoriesData.getMetadata();
 
         assertThat(data.size()).isEqualTo(4);
-        assertThat(data.get(0).getName()).isEqualTo("Agua mineral");
+        assertThat(data.get(0).getName()).isEqualTo("Agua natural");
         assertThat(data.get(1).getName()).isEqualTo("Chocolate");
         assertThat(data.get(2).getName()).isEqualTo("Helado base leche");
         assertThat(data.get(3).getName()).isEqualTo("Papas fritas");
@@ -207,12 +215,12 @@ public class ISubcategoryServiceImplTest {
         );
 
         // When
-        CustomPaginationData<SubcategoryGetResponseDto, Subcategory> subcategoriesData = subcategoryService.findAll(
+        CustomPaginationData<SubcategoryGenericResponseDto, Subcategory> subcategoriesData = subcategoryService.findAll(
                 PageRequest.of(0, 5, Sort.by("id").ascending())
         );
 
         // Then
-        List<SubcategoryGetResponseDto> data = subcategoriesData.getData();
+        List<SubcategoryGenericResponseDto> data = subcategoriesData.getData();
         CustomPageMetadata meta = subcategoriesData.getMetadata();
 
         assertThat(data.size()).isEqualTo(0);
@@ -245,13 +253,13 @@ public class ISubcategoryServiceImplTest {
         );
 
         // When
-        CustomPaginationData<SubcategoryGetResponseDto, Subcategory> subcategoriesData = subcategoryService.findAllByName(
+        CustomPaginationData<SubcategoryGenericResponseDto, Subcategory> subcategoriesData = subcategoryService.findAllByName(
                 "la",
                 PageRequest.of(0, 5, Sort.by("name").ascending())
         );
 
         // Then
-        List<SubcategoryGetResponseDto> data = subcategoriesData.getData();
+        List<SubcategoryGenericResponseDto> data = subcategoriesData.getData();
         CustomPageMetadata meta = subcategoriesData.getMetadata();
 
         assertThat(data.size()).isEqualTo(2);
@@ -283,13 +291,13 @@ public class ISubcategoryServiceImplTest {
         );
 
         // When
-        CustomPaginationData<SubcategoryGetResponseDto, Subcategory> subcategoriesData = subcategoryService.findAllByName(
+        CustomPaginationData<SubcategoryGenericResponseDto, Subcategory> subcategoriesData = subcategoryService.findAllByName(
                 "lu",
                 PageRequest.of(0, 5, Sort.by("id").ascending())
         );
 
         // Then
-        List<SubcategoryGetResponseDto> data = subcategoriesData.getData();
+        List<SubcategoryGenericResponseDto> data = subcategoriesData.getData();
         CustomPageMetadata meta = subcategoriesData.getMetadata();
 
         assertThat(data.size()).isEqualTo(0);
@@ -306,7 +314,7 @@ public class ISubcategoryServiceImplTest {
         // Given
         Integer subcategoryId = 1;
 
-        given(subcategoryDao.findById(subcategoryId)).willReturn(Optional.of(aguaMineral));
+        given(subcategoryDao.findById(subcategoryId)).willReturn(Optional.of(aguaNatural));
 
         // When
         SubcategoryGetResponseDto foundSubcategory = subcategoryService.findById(1);
@@ -314,8 +322,10 @@ public class ISubcategoryServiceImplTest {
         // Then
         assertThat(foundSubcategory).isNotNull();
         assertThat(foundSubcategory.getId()).isEqualTo(1);
-        assertThat(foundSubcategory.getName()).isEqualTo("Agua mineral");
+        assertThat(foundSubcategory.getName()).isEqualTo("Agua natural");
         assertThat(foundSubcategory.getDescription()).isEqualTo(null);
+        assertThat(foundSubcategory.getCategory().getName()).isEqualTo("Bebidas");
+        assertThat(foundSubcategory.getProducts().get(0).getName()).isEqualTo("Estrella Marina");
     }
 
     @Test
@@ -334,16 +344,17 @@ public class ISubcategoryServiceImplTest {
     @Test
     public void save_NonExistingSubcategory_Return_SavedSubcategory() {
         // Given
-        given(subcategoryDao.existsByName(subcategorySaveRequestGomitas.getName())).willReturn(false);
-        given(subcategoryDao.save(subcategoryToSaveGomitas)).willReturn(subcategorySavedGomitas);
+        given(subcategoryDao.existsByName(gomitasSaveRequest.getName())).willReturn(false);
+        given(subcategoryDao.save(gomitasToSave)).willReturn(gomitasSaved);
 
         // When
-        SubcategorySaveResponseDto savedSubcategory = subcategoryService.save(subcategorySaveRequestGomitas);
+        SubcategoryGenericResponseDto savedSubcategory = subcategoryService.save(gomitasSaveRequest);
 
         // Then
         assertThat(savedSubcategory).isNotNull();
         assertThat(savedSubcategory.getName()).isEqualTo("Gomitas");
         assertThat(savedSubcategory.getDescription()).isEqualTo(null);
+        assertThat(savedSubcategory.getCategory().getName()).isEqualTo("Botanas");
     }
 
     @Test
@@ -353,7 +364,7 @@ public class ISubcategoryServiceImplTest {
 
         // When
         Throwable thrown = assertThrows(DataAlreadyExistsException.class,
-                () -> subcategoryService.save(subcategorySaveRequestGomitas));
+                () -> subcategoryService.save(gomitasSaveRequest));
 
         // Then
         MatcherAssert.assertThat(thrown.getMessage(), is("Subcategory already exists!"));
@@ -364,17 +375,18 @@ public class ISubcategoryServiceImplTest {
         // Given
         Integer subcategoryId = 5;
 
-        given(subcategoryDao.findById(subcategoryId)).willReturn(Optional.ofNullable(subcategoryToUpdateGomitas));
-        given(subcategoryDao.save(subcategoryToUpdateGomitas)).willReturn(subcategoryUpdatedGomitas);
+        given(subcategoryDao.findById(subcategoryId)).willReturn(Optional.ofNullable(gomitasToUpdate));
+        given(subcategoryDao.save(gomitasToUpdate)).willReturn(gomitasUpdated);
 
         // When
-        SubcategorySaveResponseDto updatedSubcategory = subcategoryService.update(5, subcategoryUpdateRequestGomitas);
+        SubcategoryGenericResponseDto updatedSubcategory = subcategoryService.update(5, gomitasUpdateRequest);
 
         // Then
         assertThat(updatedSubcategory).isNotNull();
         assertThat(updatedSubcategory.getId()).isEqualTo(5);
         assertThat(updatedSubcategory.getName()).isEqualTo("Caramelos de goma");
         assertThat(updatedSubcategory.getDescription()).isEqualTo(null);
+        assertThat(updatedSubcategory.getCategory().getName()).isEqualTo("Dulces");
     }
 
     @Test
@@ -384,7 +396,7 @@ public class ISubcategoryServiceImplTest {
 
         // When
         Throwable thrown = assertThrows(DataNotFoundException.class,
-                () -> subcategoryService.update(100, subcategoryUpdateRequestGomitas));
+                () -> subcategoryService.update(100, gomitasUpdateRequest));
 
         // Then
         MatcherAssert.assertThat(thrown.getMessage(), is("Subcategory does not exist!"));

@@ -5,11 +5,11 @@ import com.alivro.spring.sleepyringtail.exception.DataAlreadyExistsException;
 import com.alivro.spring.sleepyringtail.exception.DataNotFoundException;
 import com.alivro.spring.sleepyringtail.model.Product;
 import com.alivro.spring.sleepyringtail.model.Subcategory;
-import com.alivro.spring.sleepyringtail.model.product.request.ProductSaveRequestDto;
-import com.alivro.spring.sleepyringtail.model.product.request.SubcategoryOfProductRequestDto;
-import com.alivro.spring.sleepyringtail.model.product.response.ProductResponseDto;
+import com.alivro.spring.sleepyringtail.model.product.request.ProductGenericRequestDto;
+import com.alivro.spring.sleepyringtail.model.product.response.ProductGenericResponseDto;
 import com.alivro.spring.sleepyringtail.service.IProductService;
 import com.alivro.spring.sleepyringtail.util.pagination.CustomPaginationData;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +23,7 @@ import java.util.Optional;
 @Service
 public class IProductServiceImpl implements IProductService {
     private final ProductDao productDao;
+    private final ModelMapper modelMapper = new ModelMapper();
     private final Logger logger = LoggerFactory.getLogger(IProductServiceImpl.class);
 
     /**
@@ -41,14 +42,14 @@ public class IProductServiceImpl implements IProductService {
      * @return Información de todos los productos
      */
     @Override
-    public CustomPaginationData<ProductResponseDto, Product> findAll(Pageable pageable) {
+    public CustomPaginationData<ProductGenericResponseDto, Product> findAll(Pageable pageable) {
         logger.info("Busca todos los productos.");
 
         Page<Product> productsPage = productDao.findAll(pageable);
 
         // Información de los productos
-        List<ProductResponseDto> foundProducts = productsPage.stream()
-                .map(ProductResponseDto::mapEntityToResponseDto)
+        List<ProductGenericResponseDto> foundProducts = productsPage.stream()
+                .map(product -> modelMapper.map(product, ProductGenericResponseDto.class))
                 .toList();
 
         return new CustomPaginationData<>(foundProducts, productsPage);
@@ -62,14 +63,14 @@ public class IProductServiceImpl implements IProductService {
      * @return Información de los productos que cumplen con el criterio de búsqueda
      */
     @Override
-    public CustomPaginationData<ProductResponseDto, Product> findAllByName(String word, Pageable pageable) {
+    public CustomPaginationData<ProductGenericResponseDto, Product> findAllByName(String word, Pageable pageable) {
         logger.info("Busca todos los productos. Nombre: {} ", word);
 
         Page<Product> productPage = productDao.findByNameContainingIgnoreCase(word, pageable);
 
         // Información de las categorías
-        List<ProductResponseDto> foundProducts = productPage.stream()
-                .map(ProductResponseDto::mapEntityToResponseDto)
+        List<ProductGenericResponseDto> foundProducts = productPage.stream()
+                .map(product -> modelMapper.map(product, ProductGenericResponseDto.class))
                 .toList();
 
         return new CustomPaginationData<>(foundProducts, productPage);
@@ -83,14 +84,14 @@ public class IProductServiceImpl implements IProductService {
      * @return Información de los productos que cumplen con el criterio de búsqueda
      */
     @Override
-    public CustomPaginationData<ProductResponseDto, Product> findAllByDescription(String word, Pageable pageable) {
+    public CustomPaginationData<ProductGenericResponseDto, Product> findAllByDescription(String word, Pageable pageable) {
         logger.info("Busca todos los productos. Descripción: {} ", word);
 
         Page<Product> productPage = productDao.findByDescriptionContainingIgnoreCase(word, pageable);
 
         // Información de las categorías
-        List<ProductResponseDto> foundProducts = productPage.stream()
-                .map(ProductResponseDto::mapEntityToResponseDto)
+        List<ProductGenericResponseDto> foundProducts = productPage.stream()
+                .map(product -> modelMapper.map(product, ProductGenericResponseDto.class))
                 .toList();
 
         return new CustomPaginationData<>(foundProducts, productPage);
@@ -103,7 +104,7 @@ public class IProductServiceImpl implements IProductService {
      * @return Información del producto buscado
      */
     @Override
-    public ProductResponseDto findById(Integer id) {
+    public ProductGenericResponseDto findById(Integer id) {
         logger.info("Busca producto. ID: {}", id);
 
         Optional<Product> foundProduct = productDao.findById(id);
@@ -114,7 +115,7 @@ public class IProductServiceImpl implements IProductService {
             throw new DataNotFoundException("Product not found!");
         }
 
-        return ProductResponseDto.mapEntityToResponseDto(foundProduct.get());
+        return modelMapper.map(foundProduct.get(), ProductGenericResponseDto.class);
     }
 
     /**
@@ -124,7 +125,7 @@ public class IProductServiceImpl implements IProductService {
      * @return Información del producto guardado
      */
     @Override
-    public ProductResponseDto save(ProductSaveRequestDto request) {
+    public ProductGenericResponseDto save(ProductGenericRequestDto request) {
         String barcode = request.getBarcode();
 
         logger.info("Busca producto. Código de barras: {}", barcode);
@@ -140,12 +141,12 @@ public class IProductServiceImpl implements IProductService {
         logger.info("Producto no existente. Código de barras: {}", barcode);
         logger.info("Guarda producto. Código de barras: {}", barcode);
 
-        // Guarda la información de la nueva producto
+        // Guarda la información del nuevo producto
         Product savedProduct = productDao.save(
-                ProductSaveRequestDto.mapRequestDtoToEntity(request)
+                modelMapper.map(request, Product.class)
         );
 
-        return ProductResponseDto.mapEntityToResponseDto(savedProduct);
+        return modelMapper.map(savedProduct, ProductGenericResponseDto.class);
     }
 
     /**
@@ -156,7 +157,7 @@ public class IProductServiceImpl implements IProductService {
      * @return Información del producto actualizado
      */
     @Override
-    public ProductResponseDto update(Integer id, ProductSaveRequestDto request) {
+    public ProductGenericResponseDto update(Integer id, ProductGenericRequestDto request) {
         logger.info("Busca producto. ID: {}", id);
 
         Optional<Product> foundProduct = productDao.findById(id);
@@ -171,8 +172,8 @@ public class IProductServiceImpl implements IProductService {
 
         // Información del producto a actualizar
         Product productToUpdate = foundProduct.get();
-        Subcategory subcategory = SubcategoryOfProductRequestDto
-                .mapRequestDtoToEntity(request.getSubcategory());
+        Subcategory subcategory = modelMapper.map(request.getSubcategory(), Subcategory.class);
+
         productToUpdate.setName(request.getName());
         productToUpdate.setDescription(request.getDescription());
         productToUpdate.setSize(request.getSize());
@@ -185,7 +186,7 @@ public class IProductServiceImpl implements IProductService {
         // Actualiza la información del producto
         Product updatedProduct = productDao.save(productToUpdate);
 
-        return ProductResponseDto.mapEntityToResponseDto(updatedProduct);
+        return modelMapper.map(updatedProduct, ProductGenericResponseDto.class);
     }
 
     /**

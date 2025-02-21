@@ -2,9 +2,9 @@ package com.alivro.spring.sleepyringtail.controller;
 
 import com.alivro.spring.sleepyringtail.handler.ResponseHandler;
 import com.alivro.spring.sleepyringtail.model.Subcategory;
-import com.alivro.spring.sleepyringtail.model.subcategory.request.SubcategorySaveRequestDto;
+import com.alivro.spring.sleepyringtail.model.subcategory.request.SubcategoryGenericRequestDto;
+import com.alivro.spring.sleepyringtail.model.subcategory.response.SubcategoryGenericResponseDto;
 import com.alivro.spring.sleepyringtail.model.subcategory.response.SubcategoryGetResponseDto;
-import com.alivro.spring.sleepyringtail.model.subcategory.response.SubcategorySaveResponseDto;
 import com.alivro.spring.sleepyringtail.service.ISubcategoryService;
 import com.alivro.spring.sleepyringtail.util.pagination.CustomPageMetadata;
 import com.alivro.spring.sleepyringtail.util.pagination.CustomPaginationData;
@@ -43,10 +43,11 @@ public class SubcategoryController {
      * @return Información de todos las subcategorías
      */
     @GetMapping("/getAll")
-    public ResponseEntity<CustomResponse<SubcategoryGetResponseDto, CustomPageMetadata>> getAllSubcategories(
+    public ResponseEntity<CustomResponse<SubcategoryGenericResponseDto, CustomPageMetadata>> getAllSubcategories(
             @PageableDefault(page = 0, size = 5, sort = "id", direction = Sort.Direction.ASC)
             Pageable pageable) {
-        CustomPaginationData<SubcategoryGetResponseDto, Subcategory> subcategoriesData = subcategoryService.findAll(pageable);
+        CustomPaginationData<SubcategoryGenericResponseDto, Subcategory> subcategoriesData =
+                subcategoryService.findAll(pageable);
 
         logger.info("Subcategorías encontradas.");
 
@@ -63,11 +64,11 @@ public class SubcategoryController {
      * @return Información de todas las subcategorías que cumplen con el criterio de búsqueda
      */
     @GetMapping("/getAllByName/{word}")
-    public ResponseEntity<CustomResponse<SubcategoryGetResponseDto, CustomPageMetadata>> getAllSubcategoriesByName(
+    public ResponseEntity<CustomResponse<SubcategoryGenericResponseDto, CustomPageMetadata>> getAllSubcategoriesByName(
             @PathVariable("word") String word,
             @PageableDefault(page = 0, size = 5, sort = "id", direction = Sort.Direction.ASC)
             Pageable pageable) {
-        CustomPaginationData<SubcategoryGetResponseDto, Subcategory> subcategoriesData =
+        CustomPaginationData<SubcategoryGenericResponseDto, Subcategory> subcategoriesData =
                 subcategoryService.findAllByName(word, pageable);
 
         logger.info("Subcategorías encontradas.");
@@ -101,9 +102,9 @@ public class SubcategoryController {
      * @return Información de la subcategoría guardada
      */
     @PostMapping("/save")
-    public ResponseEntity<CustomResponse<SubcategorySaveResponseDto, Void>> saveSubcategory(
-            @Valid @RequestBody SubcategorySaveRequestDto request) {
-        SubcategorySaveResponseDto savedSubcategory = subcategoryService.save(request);
+    public ResponseEntity<CustomResponse<SubcategoryGenericResponseDto, Void>> saveSubcategory(
+            @Valid @RequestBody SubcategoryGenericRequestDto request) {
+        SubcategoryGenericResponseDto savedSubcategory = subcategoryService.save(request);
 
         logger.info("Subcategoría guardada. ID: {}", savedSubcategory.getId());
 
@@ -120,9 +121,9 @@ public class SubcategoryController {
      * @return Información de la subcategoría actualizada
      */
     @PutMapping("/update/{id}")
-    public ResponseEntity<CustomResponse<SubcategorySaveResponseDto, Void>> updateSubcategory(
-            @PathVariable("id") Integer id, @Valid @RequestBody SubcategorySaveRequestDto request) {
-        SubcategorySaveResponseDto updatedSubcategory = subcategoryService.update(id, request);
+    public ResponseEntity<CustomResponse<SubcategoryGenericResponseDto, Void>> updateSubcategory(
+            @PathVariable("id") Integer id, @Valid @RequestBody SubcategoryGenericRequestDto request) {
+        SubcategoryGenericResponseDto updatedSubcategory = subcategoryService.update(id, request);
 
         logger.info("Subcategoría actualizada. ID: {}", id);
 

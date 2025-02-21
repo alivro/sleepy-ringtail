@@ -1,4 +1,4 @@
-package com.alivro.spring.sleepyringtail.model.product.response;
+package com.alivro.spring.sleepyringtail.model.subcategory.response;
 
 import com.alivro.spring.sleepyringtail.model.Product;
 import lombok.AllArgsConstructor;
@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ProductResponseDto {
+public class ProductOfSubcategoryResponseDto {
     // Identificador único del producto
     private Integer id;
 
@@ -22,17 +22,8 @@ public class ProductResponseDto {
     // Tamaño/Presentación del producto
     private String size;
 
-    // Descripción del producto
-    private String description;
-
     // Precio del producto
     private BigDecimal price;
-
-    // Código de barras del producto
-    private String barcode;
-
-    // Subcategoría del producto
-    private SubcategoryOfProductResponseDto subcategory;
 
     /**
      * Convierte un objeto Entity en un objeto ResponseDto
@@ -40,18 +31,12 @@ public class ProductResponseDto {
      * @param entity Información del producto
      * @return Representación ResponseDto de la información del producto
      */
-    public static ProductResponseDto mapEntityToResponseDto(Product entity) {
-        SubcategoryOfProductResponseDto subcategoryOfProduct =
-                SubcategoryOfProductResponseDto.mapEntityToResponseDto(entity.getSubcategory());
-
-        return ProductResponseDto.builder()
+    public static ProductOfSubcategoryResponseDto mapEntityToResponseDto(Product entity) {
+        return ProductOfSubcategoryResponseDto.builder()
                 .id(entity.getId())
                 .name(entity.getName())
-                .description(entity.getDescription())
                 .size(entity.getSize())
                 .price(entity.getPrice())
-                .barcode(entity.getBarcode())
-                .subcategory(subcategoryOfProduct)
                 .build();
     }
 }

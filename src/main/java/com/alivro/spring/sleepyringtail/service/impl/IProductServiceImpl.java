@@ -4,7 +4,9 @@ import com.alivro.spring.sleepyringtail.dao.ProductDao;
 import com.alivro.spring.sleepyringtail.exception.DataAlreadyExistsException;
 import com.alivro.spring.sleepyringtail.exception.DataNotFoundException;
 import com.alivro.spring.sleepyringtail.model.Product;
+import com.alivro.spring.sleepyringtail.model.Subcategory;
 import com.alivro.spring.sleepyringtail.model.product.request.ProductSaveRequestDto;
+import com.alivro.spring.sleepyringtail.model.product.request.SubcategoryOfProductRequestDto;
 import com.alivro.spring.sleepyringtail.model.product.response.ProductResponseDto;
 import com.alivro.spring.sleepyringtail.service.IProductService;
 import com.alivro.spring.sleepyringtail.util.pagination.CustomPaginationData;
@@ -169,11 +171,14 @@ public class IProductServiceImpl implements IProductService {
 
         // Información del producto a actualizar
         Product productToUpdate = foundProduct.get();
+        Subcategory subcategory = SubcategoryOfProductRequestDto
+                .mapRequestDtoToEntity(request.getSubcategory());
         productToUpdate.setName(request.getName());
         productToUpdate.setDescription(request.getDescription());
         productToUpdate.setSize(request.getSize());
         productToUpdate.setPrice(request.getPrice());
         productToUpdate.setBarcode(request.getBarcode());
+        productToUpdate.setSubcategory(subcategory);
 
         logger.info("Actualiza producto. ID: {}", id);
 

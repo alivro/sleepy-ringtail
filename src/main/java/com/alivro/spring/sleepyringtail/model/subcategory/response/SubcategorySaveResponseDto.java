@@ -6,11 +6,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SubcategoryResponseDto {
+public class SubcategorySaveResponseDto {
     // Identificador único de la subcategoría
     private Integer id;
 
@@ -29,11 +32,11 @@ public class SubcategoryResponseDto {
      * @param entity Información de la subcategoría
      * @return Representación ResponseDto de la información de la subcategoría
      */
-    public static SubcategoryResponseDto mapEntityToResponseDto(Subcategory entity) {
+    public static SubcategorySaveResponseDto mapEntityToResponseDto(Subcategory entity) {
         CategoryOfSubcategoryResponseDto categoryOfSubcategory =
                 CategoryOfSubcategoryResponseDto.mapEntityToResponseDto(entity.getCategory());
 
-        return SubcategoryResponseDto.builder()
+        return SubcategorySaveResponseDto.builder()
                 .id(entity.getId())
                 .name(entity.getName())
                 .description(entity.getDescription())

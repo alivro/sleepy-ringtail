@@ -34,4 +34,8 @@ public class Product {
 
     @Column(name = "barcode", length = 13, nullable = false, unique = true)
     private String barcode;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "subcategory_id", nullable = false, unique = false)
+    private Subcategory subcategory;
 }

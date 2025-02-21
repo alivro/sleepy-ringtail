@@ -4,7 +4,9 @@ import com.alivro.spring.sleepyringtail.exception.DataAlreadyExistsException;
 import com.alivro.spring.sleepyringtail.exception.DataNotFoundException;
 import com.alivro.spring.sleepyringtail.model.Product;
 import com.alivro.spring.sleepyringtail.model.product.request.ProductSaveRequestDto;
+import com.alivro.spring.sleepyringtail.model.product.request.SubcategoryOfProductRequestDto;
 import com.alivro.spring.sleepyringtail.model.product.response.ProductResponseDto;
+import com.alivro.spring.sleepyringtail.model.product.response.SubcategoryOfProductResponseDto;
 import com.alivro.spring.sleepyringtail.service.IProductService;
 import com.alivro.spring.sleepyringtail.util.pagination.CustomPageMetadata;
 import com.alivro.spring.sleepyringtail.util.pagination.CustomPaginationData;
@@ -69,6 +71,26 @@ public class ProductControllerTest {
     @BeforeAll
     public static void setup() {
         // Buscar todos los productos
+        SubcategoryOfProductResponseDto aguaNatural = SubcategoryOfProductResponseDto.builder()
+                .id(1)
+                .name("Agua natural")
+                .build();
+
+        SubcategoryOfProductResponseDto botanas = SubcategoryOfProductResponseDto.builder()
+                .id(2)
+                .name("Botanas")
+                .build();
+
+        SubcategoryOfProductResponseDto chocolate = SubcategoryOfProductResponseDto.builder()
+                .id(3)
+                .name("Chocolate")
+                .build();
+
+        SubcategoryOfProductResponseDto heladoLeche = SubcategoryOfProductResponseDto.builder()
+                .id(4)
+                .name("Helado base leche")
+                .build();
+
         productResponseArdillasSaladas = ProductResponseDto.builder()
                 .id(1)
                 .name("Ardillas Saladas")
@@ -76,6 +98,7 @@ public class ProductControllerTest {
                 .size("60 g")
                 .price(BigDecimal.valueOf(21.00))
                 .barcode("7501030459941")
+                .subcategory(botanas)
                 .build();
 
         productResponseEstrellaMarina = ProductResponseDto.builder()
@@ -85,6 +108,7 @@ public class ProductControllerTest {
                 .size("1 L")
                 .price(BigDecimal.valueOf(14.00))
                 .barcode("7501086801046")
+                .subcategory(aguaNatural)
                 .build();
 
         productResponseOsoAlmendrado = ProductResponseDto.builder()
@@ -94,6 +118,7 @@ public class ProductControllerTest {
                 .size("40 g")
                 .price(BigDecimal.valueOf(36.00))
                 .barcode("7501024544295")
+                .subcategory(chocolate)
                 .build();
 
         productResponseVacaNapolitana = ProductResponseDto.builder()
@@ -103,15 +128,22 @@ public class ProductControllerTest {
                 .size("1 L")
                 .price(BigDecimal.valueOf(45.00))
                 .barcode("7501130902194")
+                .subcategory(heladoLeche)
                 .build();
 
         // Guardar un nuevo producto
+        SubcategoryOfProductRequestDto subcategoryOfProductRequestChocolate = SubcategoryOfProductRequestDto.builder()
+                .id(3)
+                .name("Dulces")
+                .build();
+
         productSaveRequestVacaChocolate = ProductSaveRequestDto.builder()
                 .name("Vaca de chocolate")
                 .description("Helado")
                 .size("500 ml")
                 .price(BigDecimal.valueOf(42.00))
                 .barcode("7506306417854")
+                .subcategory(subcategoryOfProductRequestChocolate)
                 .build();
 
         productSavedResponseVacaChocolate = mapRequestDtoToResponseDto(5, productSaveRequestVacaChocolate);
@@ -123,6 +155,7 @@ public class ProductControllerTest {
                 .size("1 L")
                 .price(BigDecimal.valueOf(52.00))
                 .barcode("7501130902095")
+                .subcategory(subcategoryOfProductRequestChocolate)
                 .build();
 
         productUpdatedResponseVacaChocolate = mapRequestDtoToResponseDto(5, productUpdateRequestVacaChocolate);

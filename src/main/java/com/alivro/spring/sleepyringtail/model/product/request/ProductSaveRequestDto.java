@@ -1,6 +1,8 @@
 package com.alivro.spring.sleepyringtail.model.product.request;
 
 import com.alivro.spring.sleepyringtail.model.Product;
+import com.alivro.spring.sleepyringtail.model.Subcategory;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,6 +34,10 @@ public class ProductSaveRequestDto {
     @Pattern(regexp = "^[0-9]{13}$", message = "El campo código de barras debe estar conformado por 13 números.")
     private String barcode;
 
+    @Valid
+    @NotNull(message = "El campo subcategoría es obligatorio.")
+    private SubcategoryOfProductRequestDto subcategory;
+
     /**
      * Convierte un objeto RequestDto en un objeto Entity
      *
@@ -39,12 +45,16 @@ public class ProductSaveRequestDto {
      * @return Representación Entity de la información del producto
      */
     public static Product mapRequestDtoToEntity(ProductSaveRequestDto request) {
+        Subcategory subcategoryOfProduct =
+                SubcategoryOfProductRequestDto.mapRequestDtoToEntity(request.getSubcategory());
+
         return Product.builder()
                 .name(request.getName())
                 .description(request.getDescription())
                 .size(request.getSize())
                 .price(request.getPrice())
                 .barcode(request.getBarcode())
+                .subcategory(subcategoryOfProduct)
                 .build();
     }
 

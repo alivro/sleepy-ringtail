@@ -6,7 +6,9 @@ import com.alivro.spring.sleepyringtail.model.Subcategory;
 import com.alivro.spring.sleepyringtail.model.subcategory.request.CategoryOfSubcategoryRequestDto;
 import com.alivro.spring.sleepyringtail.model.subcategory.request.SubcategorySaveRequestDto;
 import com.alivro.spring.sleepyringtail.model.subcategory.response.CategoryOfSubcategoryResponseDto;
-import com.alivro.spring.sleepyringtail.model.subcategory.response.SubcategoryResponseDto;
+import com.alivro.spring.sleepyringtail.model.subcategory.response.ProductOfSubcategoryResponseDto;
+import com.alivro.spring.sleepyringtail.model.subcategory.response.SubcategoryGetResponseDto;
+import com.alivro.spring.sleepyringtail.model.subcategory.response.SubcategorySaveResponseDto;
 import com.alivro.spring.sleepyringtail.service.ISubcategoryService;
 import com.alivro.spring.sleepyringtail.util.pagination.CustomPageMetadata;
 import com.alivro.spring.sleepyringtail.util.pagination.CustomPaginationData;
@@ -27,7 +29,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -54,18 +58,18 @@ public class SubcategoryControllerTest {
     private static final String url = "/api/v1/subcategory";
 
     // Buscar todas las subcategorías
-    private static SubcategoryResponseDto subcategoryResponseAguaMineral;
-    private static SubcategoryResponseDto subcategoryResponseChocolate;
-    private static SubcategoryResponseDto subcategoryResponseHeladoLeche;
-    private static SubcategoryResponseDto subcategoryResponsePapasFritas;
+    private static SubcategoryGetResponseDto subcategoryGetResponseAguaNatural;
+    private static SubcategoryGetResponseDto subcategoryGetResponseChocolate;
+    private static SubcategoryGetResponseDto subcategoryGetResponseHeladoLeche;
+    private static SubcategoryGetResponseDto subcategoryGetResponsePapasFritas;
 
     // Guardar una nueva subcategoría
     private static SubcategorySaveRequestDto subcategorySaveRequestGomitas;
-    private static SubcategoryResponseDto subcategorySavedResponseGomitas;
+    private static SubcategorySaveResponseDto subcategorySavedResponseGomitas;
 
     // Actualizar una subcategoría existente
     private static SubcategorySaveRequestDto subcategoryUpdateRequestGomitas;
-    private static SubcategoryResponseDto subcategoryUpdatedResponseGomitas;
+    private static SubcategorySaveResponseDto subcategoryUpdatedResponseGomitas;
 
     @BeforeAll
     public static void setup() {
@@ -90,28 +94,38 @@ public class SubcategoryControllerTest {
                 .name("Helados")
                 .build();
 
-        subcategoryResponseAguaMineral = SubcategoryResponseDto.builder()
-                .id(1)
-                .name("Agua mineral")
-                .category(bebidas)
+        ProductOfSubcategoryResponseDto estrellaMarina = ProductOfSubcategoryResponseDto.builder()
+                .name("Estrella Marina")
+                .size("1 L")
+                .price(BigDecimal.valueOf(14.00))
                 .build();
 
-        subcategoryResponseChocolate = SubcategoryResponseDto.builder()
+        subcategoryGetResponseAguaNatural = SubcategoryGetResponseDto.builder()
+                .id(1)
+                .name("Agua natural")
+                .category(bebidas)
+                .products(Collections.singletonList(estrellaMarina))
+                .build();
+
+        subcategoryGetResponseChocolate = SubcategoryGetResponseDto.builder()
                 .id(2)
                 .name("Chocolate")
                 .category(dulces)
+                .products(new ArrayList<>())
                 .build();
 
-        subcategoryResponseHeladoLeche = SubcategoryResponseDto.builder()
+        subcategoryGetResponseHeladoLeche = SubcategoryGetResponseDto.builder()
                 .id(3)
                 .name("Helado base leche")
                 .category(helados)
+                .products(new ArrayList<>())
                 .build();
 
-        subcategoryResponsePapasFritas = SubcategoryResponseDto.builder()
+        subcategoryGetResponsePapasFritas = SubcategoryGetResponseDto.builder()
                 .id(4)
                 .name("Papas fritas")
                 .category(botanas)
+                .products(new ArrayList<>())
                 .build();
 
         // Guardar una nueva categoría
@@ -146,11 +160,11 @@ public class SubcategoryControllerTest {
                 .withPage(pageNumber)
                 .withSort(Sort.by(sortBy).ascending());
 
-        List<SubcategoryResponseDto> foundSubcategories = new ArrayList<>();
-        foundSubcategories.add(subcategoryResponseAguaMineral);
-        foundSubcategories.add(subcategoryResponseChocolate);
-        foundSubcategories.add(subcategoryResponseHeladoLeche);
-        foundSubcategories.add(subcategoryResponsePapasFritas);
+        List<SubcategoryGetResponseDto> foundSubcategories = new ArrayList<>();
+        foundSubcategories.add(subcategoryGetResponseAguaNatural);
+        foundSubcategories.add(subcategoryGetResponseChocolate);
+        foundSubcategories.add(subcategoryGetResponseHeladoLeche);
+        foundSubcategories.add(subcategoryGetResponsePapasFritas);
 
         CustomPageMetadata metadata = CustomPageMetadata.builder()
                 .pageNumber(pageNumber)
@@ -161,7 +175,7 @@ public class SubcategoryControllerTest {
                 .build();
 
         given(subcategoryService.findAll(pageable)).willReturn(
-                CustomPaginationData.<SubcategoryResponseDto, Subcategory>builder()
+                CustomPaginationData.<SubcategoryGetResponseDto, Subcategory>builder()
                         .data(foundSubcategories)
                         .metadata(metadata)
                         .build()
@@ -181,7 +195,7 @@ public class SubcategoryControllerTest {
 
         response.andExpect(MockMvcResultMatchers.jsonPath("$.data", hasSize(4)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].name",
-                        CoreMatchers.is("Agua mineral")))
+                        CoreMatchers.is("Agua natural")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[1].name",
                         CoreMatchers.is("Chocolate")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[2].name",
@@ -211,7 +225,7 @@ public class SubcategoryControllerTest {
                 .withPage(pageNumber)
                 .withSort(Sort.by(sortBy).ascending());
 
-        List<SubcategoryResponseDto> foundSubcategories = new ArrayList<>();
+        List<SubcategoryGetResponseDto> foundSubcategories = new ArrayList<>();
 
         CustomPageMetadata metadata = CustomPageMetadata.builder()
                 .pageNumber(pageNumber)
@@ -222,7 +236,7 @@ public class SubcategoryControllerTest {
                 .build();
 
         given(subcategoryService.findAll(pageable)).willReturn(
-                CustomPaginationData.<SubcategoryResponseDto, Subcategory>builder()
+                CustomPaginationData.<SubcategoryGetResponseDto, Subcategory>builder()
                         .data(foundSubcategories)
                         .metadata(metadata)
                         .build()
@@ -261,9 +275,9 @@ public class SubcategoryControllerTest {
                 .withPage(pageNumber)
                 .withSort(Sort.by(sortBy).ascending());
 
-        List<SubcategoryResponseDto> foundSubcategories = new ArrayList<>();
-        foundSubcategories.add(subcategoryResponseChocolate);
-        foundSubcategories.add(subcategoryResponseHeladoLeche);
+        List<SubcategoryGetResponseDto> foundSubcategories = new ArrayList<>();
+        foundSubcategories.add(subcategoryGetResponseChocolate);
+        foundSubcategories.add(subcategoryGetResponseHeladoLeche);
 
         CustomPageMetadata metadata = CustomPageMetadata.builder()
                 .pageNumber(pageNumber)
@@ -274,7 +288,7 @@ public class SubcategoryControllerTest {
                 .build();
 
         given(subcategoryService.findAllByName(word, pageable)).willReturn(
-                CustomPaginationData.<SubcategoryResponseDto, Subcategory>builder()
+                CustomPaginationData.<SubcategoryGetResponseDto, Subcategory>builder()
                         .data(foundSubcategories)
                         .metadata(metadata)
                         .build()
@@ -321,7 +335,7 @@ public class SubcategoryControllerTest {
                 .withPage(pageNumber)
                 .withSort(Sort.by(sortBy).ascending());
 
-        List<SubcategoryResponseDto> foundSubcategories = new ArrayList<>();
+        List<SubcategoryGetResponseDto> foundSubcategories = new ArrayList<>();
 
         CustomPageMetadata metadata = CustomPageMetadata.builder()
                 .pageNumber(pageNumber)
@@ -332,7 +346,7 @@ public class SubcategoryControllerTest {
                 .build();
 
         given(subcategoryService.findAllByName(word, pageable)).willReturn(
-                CustomPaginationData.<SubcategoryResponseDto, Subcategory>builder()
+                CustomPaginationData.<SubcategoryGetResponseDto, Subcategory>builder()
                         .data(foundSubcategories)
                         .metadata(metadata)
                         .build()
@@ -365,7 +379,7 @@ public class SubcategoryControllerTest {
         //Given
         Integer subcategoryId = 1;
 
-        given(subcategoryService.findById(subcategoryId)).willReturn(subcategoryResponseAguaMineral);
+        given(subcategoryService.findById(subcategoryId)).willReturn(subcategoryGetResponseAguaNatural);
 
         // When
         ResultActions response = mockMvc.perform(get(url + "/get/{id}", 1));
@@ -378,7 +392,7 @@ public class SubcategoryControllerTest {
         response.andExpect(MockMvcResultMatchers.jsonPath("$.data[0].id")
                         .value(1))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].name",
-                        CoreMatchers.is("Agua mineral")))
+                        CoreMatchers.is("Agua natural")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].category.name",
                         CoreMatchers.is("Bebidas")));
     }
@@ -499,13 +513,13 @@ public class SubcategoryControllerTest {
                         CoreMatchers.is("Deleted subcategory!")));
     }
 
-    private static SubcategoryResponseDto mapRequestDtoToResponseDto(Integer id, SubcategorySaveRequestDto request) {
+    private static SubcategorySaveResponseDto mapRequestDtoToResponseDto(Integer id, SubcategorySaveRequestDto request) {
         CategoryOfSubcategoryResponseDto categoryOfSubcategory = CategoryOfSubcategoryResponseDto.builder()
                 .id(request.getCategory().getId())
                 .name(request.getCategory().getName())
                 .build();
 
-        return SubcategoryResponseDto.builder()
+        return SubcategorySaveResponseDto.builder()
                 .id(id)
                 .name(request.getName())
                 .description(request.getDescription())

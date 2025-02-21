@@ -4,7 +4,9 @@ import com.alivro.spring.sleepyringtail.dao.ProductDao;
 import com.alivro.spring.sleepyringtail.exception.DataAlreadyExistsException;
 import com.alivro.spring.sleepyringtail.exception.DataNotFoundException;
 import com.alivro.spring.sleepyringtail.model.Product;
+import com.alivro.spring.sleepyringtail.model.Subcategory;
 import com.alivro.spring.sleepyringtail.model.product.request.ProductSaveRequestDto;
+import com.alivro.spring.sleepyringtail.model.product.request.SubcategoryOfProductRequestDto;
 import com.alivro.spring.sleepyringtail.model.product.response.ProductResponseDto;
 import com.alivro.spring.sleepyringtail.util.pagination.CustomPageMetadata;
 import com.alivro.spring.sleepyringtail.util.pagination.CustomPaginationData;
@@ -62,6 +64,26 @@ public class IProductServiceImplTest {
     @BeforeAll
     public static void setup() {
         // Buscar todos los productos
+        Subcategory aguaNatural = Subcategory.builder()
+                .id(1)
+                .name("Agua natural")
+                .build();
+
+        Subcategory botanas = Subcategory.builder()
+                .id(2)
+                .name("Botanas")
+                .build();
+
+        Subcategory chocolate = Subcategory.builder()
+                .id(3)
+                .name("Chocolate")
+                .build();
+
+        Subcategory heladoLeche = Subcategory.builder()
+                .id(4)
+                .name("Helado base leche")
+                .build();
+
         ardillasSaladas = Product.builder()
                 .id(1)
                 .name("Ardillas Saladas")
@@ -69,6 +91,7 @@ public class IProductServiceImplTest {
                 .size("60 g")
                 .price(BigDecimal.valueOf(21.00))
                 .barcode("7501030459941")
+                .subcategory(botanas)
                 .build();
 
         estrellaMarina = Product.builder()
@@ -78,6 +101,7 @@ public class IProductServiceImplTest {
                 .size("1 L")
                 .price(BigDecimal.valueOf(14.00))
                 .barcode("7501086801046")
+                .subcategory(aguaNatural)
                 .build();
 
         osoAlmendrado = Product.builder()
@@ -87,6 +111,7 @@ public class IProductServiceImplTest {
                 .size("40 g")
                 .price(BigDecimal.valueOf(36.00))
                 .barcode("7501024544295")
+                .subcategory(chocolate)
                 .build();
 
         vacaNapolitana = Product.builder()
@@ -96,15 +121,22 @@ public class IProductServiceImplTest {
                 .size("1 L")
                 .price(BigDecimal.valueOf(45.00))
                 .barcode("7501130902194")
+                .subcategory(heladoLeche)
                 .build();
 
         // Guardar un nuevo producto
+        SubcategoryOfProductRequestDto subcategoryOfProductRequestChocolate = SubcategoryOfProductRequestDto.builder()
+                .id(3)
+                .name("Chocolate")
+                .build();
+
         productSaveRequestVacaChocolate = ProductSaveRequestDto.builder()
                 .name("Vaca de chocolate")
                 .description("Helado")
                 .size("500 ml")
                 .price(BigDecimal.valueOf(42.00))
                 .barcode("7506306417854")
+                .subcategory(subcategoryOfProductRequestChocolate)
                 .build();
 
         productToSaveVacaChocolate = ProductSaveRequestDto.mapRequestDtoToEntity(productSaveRequestVacaChocolate);
@@ -118,6 +150,7 @@ public class IProductServiceImplTest {
                 .size("1 L")
                 .price(BigDecimal.valueOf(52.00))
                 .barcode("7501130902095")
+                .subcategory(subcategoryOfProductRequestChocolate)
                 .build();
 
         productToUpdateVacaChocolate = ProductSaveRequestDto.mapRequestDtoToEntity(productUpdateRequestVacaChocolate);

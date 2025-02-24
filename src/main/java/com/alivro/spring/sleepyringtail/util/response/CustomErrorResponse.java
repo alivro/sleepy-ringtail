@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -16,7 +17,7 @@ public class CustomErrorResponse<S> {
     private int status;
 
     // Mensaje de error
-    private String error;
+    private List<String> errors;
 
     // URL de la solicitud
     private String path;

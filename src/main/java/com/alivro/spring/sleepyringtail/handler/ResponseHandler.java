@@ -63,16 +63,16 @@ public class ResponseHandler {
      * Método para enviar una respuesta de error
      *
      * @param status   Código de estado HTTP
-     * @param error    Mensaje de error
+     * @param errors   Mensajes de error
      * @param path     URL de la solicitud
      * @param metadata Metadatos
      * @return Respuesta HTTP
      */
     public static <S> ResponseEntity<CustomErrorResponse<S>> sendErrorResponse(
-            HttpStatus status, String error, String path, S metadata) {
+            HttpStatus status, List<String> errors, String path, S metadata) {
         CustomErrorResponse<S> response = CustomErrorResponse.<S>builder()
                 .status(status.value())
-                .error(error)
+                .errors(errors)
                 .path(path)
                 .timestamp(new Timestamp(System.currentTimeMillis()))
                 .metadata(metadata)
@@ -91,6 +91,19 @@ public class ResponseHandler {
      */
     public static <S> ResponseEntity<CustomErrorResponse<S>> sendErrorResponse(
             HttpStatus status, String error, String path) {
-        return sendErrorResponse(status, error, path, null);
+        return sendErrorResponse(status, Collections.singletonList(error), path, null);
+    }
+
+    /**
+     * Método para enviar una respuesta de error
+     *
+     * @param status Código de estado HTTP
+     * @param errors Mensajes de error
+     * @param path   URL de la solicitud
+     * @return Respuesta HTTP
+     */
+    public static <S> ResponseEntity<CustomErrorResponse<S>> sendErrorResponse(
+            HttpStatus status, List<String> errors, String path) {
+        return sendErrorResponse(status, errors, path, null);
     }
 }

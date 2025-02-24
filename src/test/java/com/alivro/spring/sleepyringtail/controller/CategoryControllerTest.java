@@ -379,7 +379,7 @@ public class CategoryControllerTest {
 
         // Then
         response.andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.error",
+                .andExpect(MockMvcResultMatchers.jsonPath("$.errors[0]",
                         CoreMatchers.is("Category not found!")));
     }
 
@@ -413,7 +413,7 @@ public class CategoryControllerTest {
     }
 
     @Test
-    public void save_ExistingCategory_Return_Conflict() throws Exception {
+    public void save_ExistingCategory_Return_IsConflict() throws Exception {
         // Given
         given(categoryService.save(any(CategoryGenericRequestDto.class)))
                 .willThrow(new DataAlreadyExistsException("Category already exists!"));
@@ -425,8 +425,21 @@ public class CategoryControllerTest {
 
         // Then
         response.andExpect(MockMvcResultMatchers.status().isConflict())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.error",
+                .andExpect(MockMvcResultMatchers.jsonPath("$.errors[0]",
                         CoreMatchers.is("Category already exists!")));
+    }
+
+    @Test
+    public void save_IncompleteRequestCategory_Return_IsBadRequest() throws Exception {
+        // When
+        ResultActions response = mockMvc.perform(post(url + "/save")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new CategoryGenericRequestDto())));
+
+        // Then
+        response.andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.errors[0]",
+                        CoreMatchers.is("name: El campo nombre es obligatorio.")));
     }
 
     @Test
@@ -464,7 +477,7 @@ public class CategoryControllerTest {
 
         // Then
         response.andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.error",
+                .andExpect(MockMvcResultMatchers.jsonPath("$.errors[0]",
                         CoreMatchers.is("Category does not exist!")));
     }
 

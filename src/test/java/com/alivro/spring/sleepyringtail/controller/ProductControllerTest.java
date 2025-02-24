@@ -69,6 +69,9 @@ public class ProductControllerTest {
     private static ProductGenericRequestDto vacaCocolateSaveRequest;
     private static ProductGenericResponseDto vacaCocolateSavedResponse;
 
+    // Guardar un nuevo producto (información incompleta)
+    private static ProductGenericRequestDto vacaVainillaIncompleteRequest;
+
     // Actualizar un producto existente
     private static ProductGenericRequestDto vacaChocolateUpdateRequest;
     private static ProductGenericResponseDto vacaChocolateUpdatedResponse;
@@ -169,6 +172,15 @@ public class ProductControllerTest {
                 .build();
 
         vacaCocolateSavedResponse = mapRequestDtoToResponseDto(5, vacaCocolateSaveRequest);
+
+        // Guardar un nuevo producto (información incompleta)
+        vacaVainillaIncompleteRequest = ProductGenericRequestDto.builder()
+                .name("Vaca de Vainilla")
+                .description("Helado sabor vainilla")
+                .size("1 L")
+                .price(BigDecimal.valueOf(46.00))
+                .barcode("7501130926947")
+                .build();
 
         // Actualizar un producto existente
         SubcategoryRequestDto chocolateRequest = SubcategoryRequestDto.builder()
@@ -568,7 +580,7 @@ public class ProductControllerTest {
 
         // Then
         response.andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.error",
+                .andExpect(MockMvcResultMatchers.jsonPath("$.errors[0]",
                         CoreMatchers.is("Product not found!")));
     }
 
@@ -612,7 +624,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void save_ExistingProduct_Return_Conflict() throws Exception {
+    public void save_ExistingProduct_Return_IsConflict() throws Exception {
         // Given
         given(productService.save(any(ProductGenericRequestDto.class)))
                 .willThrow(new DataAlreadyExistsException("Product already exists!"));
@@ -624,8 +636,21 @@ public class ProductControllerTest {
 
         // Then
         response.andExpect(MockMvcResultMatchers.status().isConflict())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.error",
+                .andExpect(MockMvcResultMatchers.jsonPath("$.errors[0]",
                         CoreMatchers.is("Product already exists!")));
+    }
+
+    @Test
+    public void save_IncompleteRequestProduct_Return_IsBadRequest() throws Exception {
+        // When
+        ResultActions response = mockMvc.perform(post(url + "/save")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(vacaVainillaIncompleteRequest)));
+
+        // Then
+        response.andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.errors[0]",
+                        CoreMatchers.is("subcategory: El campo subcategoría es obligatorio.")));
     }
 
     @Test
@@ -673,7 +698,7 @@ public class ProductControllerTest {
 
         // Then
         response.andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.error",
+                .andExpect(MockMvcResultMatchers.jsonPath("$.errors[0]",
                         CoreMatchers.is("Product does not exist!")));
     }
 

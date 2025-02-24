@@ -62,12 +62,15 @@ public class SubcategoryControllerTest {
     private static SubcategoryGenericResponseDto heladoLecheGetAllResponse;
     private static SubcategoryGenericResponseDto papasFritasGetAllResponse;
 
-    // Buscar por ID
+    // Buscar subcategoría por ID
     private static SubcategoryGetResponseDto aguaNaturalGetResponse;
 
     // Guardar una nueva subcategoría
     private static SubcategoryGenericRequestDto gomitasSaveRequest;
     private static SubcategoryGenericResponseDto gomitasSavedResponse;
+
+    // Guardar una nueva subcategoría (información incompleta)
+    private static SubcategoryGenericRequestDto mazapanIncompleteRequest;
 
     // Actualizar una subcategoría existente
     private static SubcategoryGenericRequestDto gomitasUpdateRequest;
@@ -75,7 +78,7 @@ public class SubcategoryControllerTest {
 
     @BeforeAll
     public static void setup() {
-        // Buscar todas las categorías
+        // Buscar todas las subcategorías
         CategoryResponseDto bebidas = CategoryResponseDto.builder()
                 .id(1)
                 .name("Bebidas")
@@ -120,7 +123,7 @@ public class SubcategoryControllerTest {
                 .category(botanas)
                 .build();
 
-        // Buscar por ID
+        // Buscar subcategoría por ID
         ProductResponseDto estrellaMarina = ProductResponseDto.builder()
                 .id(1)
                 .name("Estrella Marina")
@@ -133,7 +136,7 @@ public class SubcategoryControllerTest {
                 .products(Collections.singletonList(estrellaMarina))
                 .build();
 
-        // Guardar una nueva categoría
+        // Guardar una nueva subcategoría
         CategoryRequestDto botanasRequest = CategoryRequestDto.builder()
                 .id(2)
                 .name("Botanas")
@@ -146,7 +149,12 @@ public class SubcategoryControllerTest {
 
         gomitasSavedResponse = mapRequestDtoToResponseDto(5, gomitasSaveRequest);
 
-        // Actualizar una categoría existente
+        // Guardar una nueva subcategoría (información incompleta)
+        mazapanIncompleteRequest = SubcategoryGenericRequestDto.builder()
+                .name("Mazapán")
+                .build();
+
+        // Actualizar una subcategoría existente
         CategoryRequestDto dulcesRequest = CategoryRequestDto.builder()
                 .id(3)
                 .name("Dulces")
@@ -424,7 +432,7 @@ public class SubcategoryControllerTest {
 
         // Then
         response.andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.error",
+                .andExpect(MockMvcResultMatchers.jsonPath("$.errors[0]",
                         CoreMatchers.is("Subcategory not found!")));
     }
 
@@ -458,7 +466,7 @@ public class SubcategoryControllerTest {
     }
 
     @Test
-    public void save_ExistingSubcategory_Return_Conflict() throws Exception {
+    public void save_ExistingSubcategory_Return_IsConflict() throws Exception {
         // Given
         given(subcategoryService.save(any(SubcategoryGenericRequestDto.class)))
                 .willThrow(new DataAlreadyExistsException("Subcategory already exists!"));
@@ -470,8 +478,21 @@ public class SubcategoryControllerTest {
 
         // Then
         response.andExpect(MockMvcResultMatchers.status().isConflict())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.error",
+                .andExpect(MockMvcResultMatchers.jsonPath("$.errors[0]",
                         CoreMatchers.is("Subcategory already exists!")));
+    }
+
+    @Test
+    public void save_IncompleteRequestSubcategory_Return_IsBadRequest() throws Exception {
+        // When
+        ResultActions response = mockMvc.perform(post(url + "/save")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(mazapanIncompleteRequest)));
+
+        // Then
+        response.andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.errors[0]",
+                        CoreMatchers.is("category: El campo categoría es obligatorio.")));
     }
 
     @Test
@@ -509,7 +530,7 @@ public class SubcategoryControllerTest {
 
         // Then
         response.andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.error",
+                .andExpect(MockMvcResultMatchers.jsonPath("$.errors[0]",
                         CoreMatchers.is("Subcategory does not exist!")));
     }
 

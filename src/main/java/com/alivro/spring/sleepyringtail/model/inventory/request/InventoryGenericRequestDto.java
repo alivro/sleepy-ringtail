@@ -14,12 +14,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class InventoryGenericRequestDto {
+    @NotNull(message = "El campo cantidad disponible es obligatorio.")
     @PositiveOrZero(message = "El campo cantidad disponible debe ser un número positivo o cero.")
     private Short quantityAvailable;
 
+    @NotNull(message = "El campo stock mínimo es obligatorio.")
     @PositiveOrZero(message = "El campo stock mínimo debe ser un número positivo o cero.")
     private Short minimumStock;
 
+    @NotNull(message = "El campo stock máximo es obligatorio.")
     @PositiveOrZero(message = "El campo stock máximo debe ser un número positivo o cero.")
     private Short maximumStock;
 

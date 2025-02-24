@@ -16,10 +16,10 @@ import lombok.NoArgsConstructor;
 @Builder
 public class SubcategoryGenericRequestDto {
     @NotBlank(message = "El campo nombre es obligatorio.")
-    @Size(min = 1, max = 50, message = "El campo nombre debe tener como máximo 50 caracteres.")
+    @Size(min = 1, max = 50, message = "El campo nombre debe tener entre 1 y 50 caracteres.")
     private String name;
 
-    @Size(min = 1, max = 150, message = "El campo descripción debe tener como máximo 150 caracteres.")
+    @Size(min = 1, max = 150, message = "El campo descripción debe tener entre 1 y 150 caracteres.")
     private String description;
 
     @Valid

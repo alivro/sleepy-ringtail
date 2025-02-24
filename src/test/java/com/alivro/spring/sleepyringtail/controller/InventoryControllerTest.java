@@ -63,13 +63,16 @@ public class InventoryControllerTest {
     private static InventoryGenericRequestDto vacaChocolateSaveRequest;
     private static InventoryGenericResponseDto vacaChocolateSavedResponse;
 
-    // Actualizar un stock existente
+    // Guardar el stock de un nuevo producto (información incompleta)
+    private static InventoryGenericRequestDto vacaVainillaIncompleteRequest;
+
+    // Actualizar el stock de un producto existente
     private static InventoryGenericRequestDto vacaChocolateUpdateRequest;
     private static InventoryGenericResponseDto vacaChocolateUpdatedResponse;
 
     @BeforeAll
     public static void setup() {
-        // Buscar todos los productos
+        // Buscar el stock de todos los productos
         ProductResponseDto ardillasSaladasProduct = ProductResponseDto.builder()
                 .id(1)
                 .name("Ardillas Saladas")
@@ -122,7 +125,7 @@ public class InventoryControllerTest {
                 .product(vacaNapolitanaProduct)
                 .build();
 
-        // Guardar un nuevo producto
+        // Guardar el stock de un nuevo producto
         ProductRequestDto vacaChocolateProductRequest = ProductRequestDto.builder()
                 .id(5)
                 .name("Vaca de Chocolate")
@@ -137,7 +140,14 @@ public class InventoryControllerTest {
 
         vacaChocolateSavedResponse = mapRequestDtoToResponseDto(5, vacaChocolateSaveRequest);
 
-        // Actualizar un producto existente
+        // Guardar el stock de un nuevo producto (información incompleta)
+        vacaVainillaIncompleteRequest = InventoryGenericRequestDto.builder()
+                .quantityAvailable((short) 120)
+                .minimumStock((short) 80)
+                .maximumStock((short) 200)
+                .build();
+
+        // Actualizar el stock de un producto existente
         vacaChocolateUpdateRequest = InventoryGenericRequestDto.builder()
                 .quantityAvailable((short) 150)
                 .minimumStock((short) 100)
@@ -302,7 +312,7 @@ public class InventoryControllerTest {
 
         // Then
         response.andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.error",
+                .andExpect(MockMvcResultMatchers.jsonPath("$.errors[0]",
                         CoreMatchers.is("Product stock not found!")));
     }
 
@@ -342,7 +352,7 @@ public class InventoryControllerTest {
     }
 
     @Test
-    public void save_ExistingInventory_Return_Conflict() throws Exception {
+    public void save_ExistingInventory_Return_IsConflict() throws Exception {
         // Given
         given(inventoryService.save(any(InventoryGenericRequestDto.class)))
                 .willThrow(new DataAlreadyExistsException("Existing product stock!"));
@@ -354,8 +364,21 @@ public class InventoryControllerTest {
 
         // Then
         response.andExpect(MockMvcResultMatchers.status().isConflict())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.error",
+                .andExpect(MockMvcResultMatchers.jsonPath("$.errors[0]",
                         CoreMatchers.is("Existing product stock!")));
+    }
+
+    @Test
+    public void save_IncompleteRequestInventory_Return_IsBadRequest() throws Exception {
+        // When
+        ResultActions response = mockMvc.perform(post(url + "/save")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(vacaVainillaIncompleteRequest)));
+
+        // Then
+        response.andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.errors[0]",
+                        CoreMatchers.is("product: El campo producto es obligatorio.")));
     }
 
     @Test
@@ -401,7 +424,7 @@ public class InventoryControllerTest {
 
         // Then
         response.andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.error",
+                .andExpect(MockMvcResultMatchers.jsonPath("$.errors[0]",
                         CoreMatchers.is("Product stock does not exist!")));
     }
 

@@ -7,6 +7,7 @@ import com.alivro.spring.sleepyringtail.model.Product;
 import com.alivro.spring.sleepyringtail.model.Subcategory;
 import com.alivro.spring.sleepyringtail.model.product.request.ProductGenericRequestDto;
 import com.alivro.spring.sleepyringtail.model.product.response.ProductGenericResponseDto;
+import com.alivro.spring.sleepyringtail.model.product.response.ProductGetResponseDto;
 import com.alivro.spring.sleepyringtail.service.IProductService;
 import com.alivro.spring.sleepyringtail.util.pagination.CustomPaginationData;
 import org.modelmapper.ModelMapper;
@@ -104,7 +105,7 @@ public class IProductServiceImpl implements IProductService {
      * @return Información del producto buscado
      */
     @Override
-    public ProductGenericResponseDto findById(Integer id) {
+    public ProductGetResponseDto findById(Integer id) {
         logger.info("Busca producto. ID: {}", id);
 
         Optional<Product> foundProduct = productDao.findById(id);
@@ -115,7 +116,7 @@ public class IProductServiceImpl implements IProductService {
             throw new DataNotFoundException("Product not found!");
         }
 
-        return modelMapper.map(foundProduct.get(), ProductGenericResponseDto.class);
+        return modelMapper.map(foundProduct.get(), ProductGetResponseDto.class);
     }
 
     /**

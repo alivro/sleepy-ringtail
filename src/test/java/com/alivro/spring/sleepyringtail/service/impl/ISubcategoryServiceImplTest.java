@@ -25,7 +25,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -91,9 +90,8 @@ public class ISubcategoryServiceImplTest {
                 .build();
 
         Product estrellaMarina = Product.builder()
+                .id(1)
                 .name("Estrella Marina")
-                .size("1 L")
-                .price(BigDecimal.valueOf(14.00))
                 .build();
 
         aguaNatural = Subcategory.builder()

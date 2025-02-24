@@ -4,6 +4,7 @@ import com.alivro.spring.sleepyringtail.handler.ResponseHandler;
 import com.alivro.spring.sleepyringtail.model.Product;
 import com.alivro.spring.sleepyringtail.model.product.request.ProductGenericRequestDto;
 import com.alivro.spring.sleepyringtail.model.product.response.ProductGenericResponseDto;
+import com.alivro.spring.sleepyringtail.model.product.response.ProductGetResponseDto;
 import com.alivro.spring.sleepyringtail.service.IProductService;
 import com.alivro.spring.sleepyringtail.util.pagination.CustomPageMetadata;
 import com.alivro.spring.sleepyringtail.util.pagination.CustomPaginationData;
@@ -105,8 +106,8 @@ public class ProductController {
      * @return Información del producto buscado
      */
     @GetMapping("/get/{id}")
-    public ResponseEntity<CustomResponse<ProductGenericResponseDto, Void>> getProduct(@PathVariable("id") Integer id) {
-        ProductGenericResponseDto foundProduct = productService.findById(id);
+    public ResponseEntity<CustomResponse<ProductGetResponseDto, Void>> getProduct(@PathVariable("id") Integer id) {
+        ProductGetResponseDto foundProduct = productService.findById(id);
 
         logger.info("Producto encontrado. ID: {}", id);
 

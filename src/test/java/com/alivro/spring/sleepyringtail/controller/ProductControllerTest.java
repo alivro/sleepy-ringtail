@@ -3,10 +3,12 @@ package com.alivro.spring.sleepyringtail.controller;
 import com.alivro.spring.sleepyringtail.exception.DataAlreadyExistsException;
 import com.alivro.spring.sleepyringtail.exception.DataNotFoundException;
 import com.alivro.spring.sleepyringtail.model.Product;
-import com.alivro.spring.sleepyringtail.model.util.response.SubcategoryResponseDto;
 import com.alivro.spring.sleepyringtail.model.product.request.ProductGenericRequestDto;
-import com.alivro.spring.sleepyringtail.model.util.request.SubcategoryRequestDto;
 import com.alivro.spring.sleepyringtail.model.product.response.ProductGenericResponseDto;
+import com.alivro.spring.sleepyringtail.model.product.response.ProductGetResponseDto;
+import com.alivro.spring.sleepyringtail.model.util.request.SubcategoryRequestDto;
+import com.alivro.spring.sleepyringtail.model.util.response.InventoryResponseDto;
+import com.alivro.spring.sleepyringtail.model.util.response.SubcategoryResponseDto;
 import com.alivro.spring.sleepyringtail.service.IProductService;
 import com.alivro.spring.sleepyringtail.util.pagination.CustomPageMetadata;
 import com.alivro.spring.sleepyringtail.util.pagination.CustomPaginationData;
@@ -55,10 +57,13 @@ public class ProductControllerTest {
     private static final String url = "/api/v1/product";
 
     // Buscar todos los productos
-    private static ProductGenericResponseDto ardillasSaladasResponse;
-    private static ProductGenericResponseDto estrellaMarinaResponse;
-    private static ProductGenericResponseDto osoAlmendradoResponse;
-    private static ProductGenericResponseDto vacaNapolitanaResponse;
+    private static ProductGenericResponseDto ardillasSaladasGetAllResponse;
+    private static ProductGenericResponseDto estrellaMarinaGetAllResponse;
+    private static ProductGenericResponseDto osoAlmendradoGetAllResponse;
+    private static ProductGenericResponseDto vacaNapolitanaGetAllResponse;
+
+    // Buscar por ID
+    private static ProductGetResponseDto ardillasSaladasGetResponse;
 
     // Guardar un nuevo producto
     private static ProductGenericRequestDto vacaCocolateSaveRequest;
@@ -76,32 +81,32 @@ public class ProductControllerTest {
                 .name("Agua natural")
                 .build();
 
-        SubcategoryResponseDto botanasResponse = SubcategoryResponseDto.builder()
-                .id(2)
-                .name("Botanas")
-                .build();
-
         SubcategoryResponseDto chocolateResponse = SubcategoryResponseDto.builder()
-                .id(3)
+                .id(2)
                 .name("Chocolate")
                 .build();
 
         SubcategoryResponseDto heladoLecheResponse = SubcategoryResponseDto.builder()
-                .id(4)
+                .id(3)
                 .name("Helado base leche")
                 .build();
 
-        ardillasSaladasResponse = ProductGenericResponseDto.builder()
+        SubcategoryResponseDto papasFritasResponse = SubcategoryResponseDto.builder()
+                .id(4)
+                .name("Papas fritas")
+                .build();
+
+        ardillasSaladasGetAllResponse = ProductGenericResponseDto.builder()
                 .id(1)
                 .name("Ardillas Saladas")
                 .description("Cacahuates salados")
                 .size("60 g")
                 .price(BigDecimal.valueOf(21.00))
                 .barcode("7501030459941")
-                .subcategory(botanasResponse)
+                .subcategory(papasFritasResponse)
                 .build();
 
-        estrellaMarinaResponse = ProductGenericResponseDto.builder()
+        estrellaMarinaGetAllResponse = ProductGenericResponseDto.builder()
                 .id(2)
                 .name("Estrella Marina")
                 .description("Agua embotellada")
@@ -111,7 +116,7 @@ public class ProductControllerTest {
                 .subcategory(aguaNaturalResponse)
                 .build();
 
-        osoAlmendradoResponse = ProductGenericResponseDto.builder()
+        osoAlmendradoGetAllResponse = ProductGenericResponseDto.builder()
                 .id(3)
                 .name("Oso Almendrado")
                 .description("Barra de chocolate con leche y almendras")
@@ -121,7 +126,7 @@ public class ProductControllerTest {
                 .subcategory(chocolateResponse)
                 .build();
 
-        vacaNapolitanaResponse = ProductGenericResponseDto.builder()
+        vacaNapolitanaGetAllResponse = ProductGenericResponseDto.builder()
                 .id(4)
                 .name("Vaca Napolitana")
                 .description("Helado sabor napolitano")
@@ -129,6 +134,23 @@ public class ProductControllerTest {
                 .price(BigDecimal.valueOf(45.00))
                 .barcode("7501130902194")
                 .subcategory(heladoLecheResponse)
+                .build();
+
+        // Buscar por ID
+        InventoryResponseDto inventoryProduct = InventoryResponseDto.builder()
+                .id(1)
+                .quantityAvailable((short) 322)
+                .build();
+
+        ardillasSaladasGetResponse = ProductGetResponseDto.builder()
+                .id(1)
+                .name("Ardillas Saladas")
+                .description("Cacahuates salados")
+                .size("60 g")
+                .price(BigDecimal.valueOf(21.00))
+                .barcode("7501030459941")
+                .subcategory(papasFritasResponse)
+                .inventory(inventoryProduct)
                 .build();
 
         // Guardar un nuevo producto
@@ -177,10 +199,10 @@ public class ProductControllerTest {
                 .withSort(Sort.by(sortBy).ascending());
 
         List<ProductGenericResponseDto> foundProducts = new ArrayList<>();
-        foundProducts.add(ardillasSaladasResponse);
-        foundProducts.add(estrellaMarinaResponse);
-        foundProducts.add(osoAlmendradoResponse);
-        foundProducts.add(vacaNapolitanaResponse);
+        foundProducts.add(ardillasSaladasGetAllResponse);
+        foundProducts.add(estrellaMarinaGetAllResponse);
+        foundProducts.add(osoAlmendradoGetAllResponse);
+        foundProducts.add(vacaNapolitanaGetAllResponse);
 
         CustomPageMetadata metadata = CustomPageMetadata.builder()
                 .pageNumber(pageNumber)
@@ -292,8 +314,8 @@ public class ProductControllerTest {
                 .withSort(Sort.by(sortBy).ascending());
 
         List<ProductGenericResponseDto> foundProducts = new ArrayList<>();
-        foundProducts.add(estrellaMarinaResponse);
-        foundProducts.add(vacaNapolitanaResponse);
+        foundProducts.add(estrellaMarinaGetAllResponse);
+        foundProducts.add(vacaNapolitanaGetAllResponse);
 
         CustomPageMetadata metadata = CustomPageMetadata.builder()
                 .pageNumber(pageNumber)
@@ -402,8 +424,8 @@ public class ProductControllerTest {
                 .withSort(Sort.by(sortBy).ascending());
 
         List<ProductGenericResponseDto> foundProducts = new ArrayList<>();
-        foundProducts.add(ardillasSaladasResponse);
-        foundProducts.add(estrellaMarinaResponse);
+        foundProducts.add(ardillasSaladasGetAllResponse);
+        foundProducts.add(estrellaMarinaGetAllResponse);
 
         CustomPageMetadata metadata = CustomPageMetadata.builder()
                 .pageNumber(pageNumber)
@@ -509,7 +531,7 @@ public class ProductControllerTest {
         //Given
         Integer productId = 1;
 
-        given(productService.findById(productId)).willReturn(ardillasSaladasResponse);
+        given(productService.findById(productId)).willReturn(ardillasSaladasGetResponse);
 
         // When
         ResultActions response = mockMvc.perform(get(url + "/get/{id}", 1));
@@ -526,7 +548,11 @@ public class ProductControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].price",
                         CoreMatchers.is(21.0)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].barcode",
-                        CoreMatchers.is("7501030459941")));
+                        CoreMatchers.is("7501030459941")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].subcategory.name",
+                        CoreMatchers.is("Papas fritas")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].inventory.quantityAvailable",
+                        CoreMatchers.is(322)));
     }
 
     @Test
@@ -666,10 +692,10 @@ public class ProductControllerTest {
     }
 
     private static ProductGenericResponseDto mapRequestDtoToResponseDto(Integer id, ProductGenericRequestDto request) {
-       SubcategoryResponseDto subcategoryResponse = SubcategoryResponseDto.builder()
-               .id(request.getSubcategory().getId())
-               .name(request.getSubcategory().getName())
-               .build();
+        SubcategoryResponseDto subcategory = SubcategoryResponseDto.builder()
+                .id(request.getSubcategory().getId())
+                .name(request.getSubcategory().getName())
+                .build();
 
         return ProductGenericResponseDto.builder()
                 .id(id)
@@ -678,7 +704,7 @@ public class ProductControllerTest {
                 .size(request.getSize())
                 .price(request.getPrice())
                 .barcode(request.getBarcode())
-                .subcategory(subcategoryResponse)
+                .subcategory(subcategory)
                 .build();
     }
 }

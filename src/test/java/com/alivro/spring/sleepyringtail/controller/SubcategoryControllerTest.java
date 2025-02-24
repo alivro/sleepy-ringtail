@@ -29,7 +29,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -123,9 +122,8 @@ public class SubcategoryControllerTest {
 
         // Buscar por ID
         ProductResponseDto estrellaMarina = ProductResponseDto.builder()
+                .id(1)
                 .name("Estrella Marina")
-                .size("1 L")
-                .price(BigDecimal.valueOf(14.00))
                 .build();
 
         aguaNaturalGetResponse = SubcategoryGetResponseDto.builder()
@@ -405,6 +403,8 @@ public class SubcategoryControllerTest {
                         .value(1))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].name",
                         CoreMatchers.is("Agua natural")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].description",
+                        CoreMatchers.nullValue()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].category.name",
                         CoreMatchers.is("Bebidas")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].products[0].name",

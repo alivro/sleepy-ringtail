@@ -38,4 +38,7 @@ public class Product {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "subcategory_id", nullable = false, unique = false)
     private Subcategory subcategory;
+
+    @OneToOne(mappedBy = "product", fetch = FetchType.LAZY)
+    private Inventory inventory;
 }

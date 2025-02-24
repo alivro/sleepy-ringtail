@@ -9,10 +9,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ProductResponseDto {
-    // Identificador único del producto
+public class InventoryResponseDto {
+    // Identificador único en el inventario
     private Integer id;
 
-    // Nombre del producto
-    private String name;
+    // Cantidad disponible
+    private Short quantityAvailable;
 }

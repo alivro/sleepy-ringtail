@@ -3,10 +3,12 @@ package com.alivro.spring.sleepyringtail.service.impl;
 import com.alivro.spring.sleepyringtail.dao.ProductDao;
 import com.alivro.spring.sleepyringtail.exception.DataAlreadyExistsException;
 import com.alivro.spring.sleepyringtail.exception.DataNotFoundException;
+import com.alivro.spring.sleepyringtail.model.Inventory;
 import com.alivro.spring.sleepyringtail.model.Product;
 import com.alivro.spring.sleepyringtail.model.Subcategory;
 import com.alivro.spring.sleepyringtail.model.product.request.ProductGenericRequestDto;
 import com.alivro.spring.sleepyringtail.model.product.response.ProductGenericResponseDto;
+import com.alivro.spring.sleepyringtail.model.product.response.ProductGetResponseDto;
 import com.alivro.spring.sleepyringtail.model.util.request.SubcategoryRequestDto;
 import com.alivro.spring.sleepyringtail.util.pagination.CustomPageMetadata;
 import com.alivro.spring.sleepyringtail.util.pagination.CustomPaginationData;
@@ -72,19 +74,24 @@ public class IProductServiceImplTest {
                 .name("Agua natural")
                 .build();
 
-        Subcategory botanas = Subcategory.builder()
-                .id(2)
-                .name("Papas fritas")
-                .build();
-
         Subcategory chocolate = Subcategory.builder()
-                .id(3)
+                .id(2)
                 .name("Chocolate")
                 .build();
 
         Subcategory heladoLeche = Subcategory.builder()
-                .id(4)
+                .id(3)
                 .name("Helado base leche")
+                .build();
+
+        Subcategory papasFritas = Subcategory.builder()
+                .id(4)
+                .name("Papas fritas")
+                .build();
+
+        Inventory inventoryProduct = Inventory.builder()
+                .id(1)
+                .quantityAvailable((short) 322)
                 .build();
 
         ardillasSaladas = Product.builder()
@@ -94,7 +101,8 @@ public class IProductServiceImplTest {
                 .size("60 g")
                 .price(BigDecimal.valueOf(21.00))
                 .barcode("7501030459941")
-                .subcategory(botanas)
+                .subcategory(papasFritas)
+                .inventory(inventoryProduct)
                 .build();
 
         estrellaMarina = Product.builder()
@@ -128,7 +136,7 @@ public class IProductServiceImplTest {
                 .build();
 
         // Guardar un nuevo producto
-        SubcategoryRequestDto botanasRequest = SubcategoryRequestDto.builder()
+        SubcategoryRequestDto papasFritasRequest = SubcategoryRequestDto.builder()
                 .id(2)
                 .name("Papas fritas")
                 .build();
@@ -139,7 +147,7 @@ public class IProductServiceImplTest {
                 .size("500 ml")
                 .price(BigDecimal.valueOf(42.00))
                 .barcode("7506306417854")
-                .subcategory(botanasRequest)
+                .subcategory(papasFritasRequest)
                 .build();
 
         vacaCocolateToSave = modelMapper.map(vacaCocolateSaveRequest, Product.class);
@@ -147,7 +155,7 @@ public class IProductServiceImplTest {
         vacaCocolateSaved = vacaCocolateToSave.toBuilder().id(5).build();
 
         // Actualizar un producto existente
-        SubcategoryRequestDto chocolateRequest = SubcategoryRequestDto.builder()
+        SubcategoryRequestDto heladoLecheRequest = SubcategoryRequestDto.builder()
                 .id(4)
                 .name("Helado base leche")
                 .build();
@@ -158,7 +166,7 @@ public class IProductServiceImplTest {
                 .size("1 L")
                 .price(BigDecimal.valueOf(52.00))
                 .barcode("7501130902095")
-                .subcategory(chocolateRequest)
+                .subcategory(heladoLecheRequest)
                 .build();
 
         vacaChocolateToUpdate = modelMapper.map(vacaChocolateUpdateRequest, Product.class);
@@ -407,7 +415,7 @@ public class IProductServiceImplTest {
         given(productDao.findById(productId)).willReturn(Optional.of(ardillasSaladas));
 
         // When
-        ProductGenericResponseDto foundProduct = productService.findById(1);
+        ProductGetResponseDto foundProduct = productService.findById(1);
 
         // Then
         assertThat(foundProduct).isNotNull();
@@ -416,6 +424,7 @@ public class IProductServiceImplTest {
         assertThat(foundProduct.getPrice()).isEqualTo(BigDecimal.valueOf(21.00));
         assertThat(foundProduct.getBarcode()).isEqualTo("7501030459941");
         assertThat(foundProduct.getSubcategory().getName()).isEqualTo("Papas fritas");
+        assertThat(foundProduct.getInventory().getQuantityAvailable()).isEqualTo((short) 322);
     }
 
     @Test

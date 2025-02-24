@@ -3,6 +3,7 @@ package com.alivro.spring.sleepyringtail.service;
 import com.alivro.spring.sleepyringtail.model.Product;
 import com.alivro.spring.sleepyringtail.model.product.request.ProductGenericRequestDto;
 import com.alivro.spring.sleepyringtail.model.product.response.ProductGenericResponseDto;
+import com.alivro.spring.sleepyringtail.model.product.response.ProductGetResponseDto;
 import com.alivro.spring.sleepyringtail.util.pagination.CustomPaginationData;
 import org.springframework.data.domain.Pageable;
 
@@ -38,7 +39,7 @@ public interface IProductService {
      * @param id Identificador único del producto
      * @return Información del producto buscado
      */
-    ProductGenericResponseDto findById(Integer id);
+    ProductGetResponseDto findById(Integer id);
 
     /**
      * Método para guardar un nuevo producto

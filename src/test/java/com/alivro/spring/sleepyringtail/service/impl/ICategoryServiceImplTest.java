@@ -1,5 +1,6 @@
 package com.alivro.spring.sleepyringtail.service.impl;
 
+import com.alivro.spring.sleepyringtail.constants.MessageConstants;
 import com.alivro.spring.sleepyringtail.dao.CategoryDao;
 import com.alivro.spring.sleepyringtail.exception.DataAlreadyExistsException;
 import com.alivro.spring.sleepyringtail.exception.DataNotFoundException;
@@ -312,7 +313,7 @@ public class ICategoryServiceImplTest {
                 () -> categoryService.findById(100));
 
         // Then
-        MatcherAssert.assertThat(thrown.getMessage(), is("Category not found!"));
+        MatcherAssert.assertThat(thrown.getMessage(), is(MessageConstants.CATEGORY_NOT_FOUND));
     }
 
     @Test
@@ -340,7 +341,7 @@ public class ICategoryServiceImplTest {
                 () -> categoryService.save(vinosSaveRequest));
 
         // Then
-        MatcherAssert.assertThat(thrown.getMessage(), is("Category already exists!"));
+        MatcherAssert.assertThat(thrown.getMessage(), is(MessageConstants.CATEGORY_ALREADY_EXISTS));
     }
 
     @Test
@@ -371,7 +372,7 @@ public class ICategoryServiceImplTest {
                 () -> categoryService.update(100, vinosUpdateRequest));
 
         // Then
-        MatcherAssert.assertThat(thrown.getMessage(), is("Category does not exist!"));
+        MatcherAssert.assertThat(thrown.getMessage(), is(MessageConstants.CATEGORY_NOT_FOUND));
     }
 
     @Test

@@ -1,5 +1,6 @@
 package com.alivro.spring.sleepyringtail.controller;
 
+import com.alivro.spring.sleepyringtail.constants.MessageConstants;
 import com.alivro.spring.sleepyringtail.exception.DataAlreadyExistsException;
 import com.alivro.spring.sleepyringtail.exception.DataNotFoundException;
 import com.alivro.spring.sleepyringtail.model.Category;
@@ -162,7 +163,7 @@ public class CategoryControllerTest {
         // Then
         response.andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Found categories!")));
+                        CoreMatchers.is(MessageConstants.FOUND_CATEGORIES)));
 
         response.andExpect(MockMvcResultMatchers.jsonPath("$.data", hasSize(4)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].name",
@@ -219,7 +220,7 @@ public class CategoryControllerTest {
         // Then
         response.andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Found categories!")));
+                        CoreMatchers.is(MessageConstants.FOUND_CATEGORIES)));
 
         response.andExpect(MockMvcResultMatchers.jsonPath("$.data", hasSize(0)));
 
@@ -275,7 +276,7 @@ public class CategoryControllerTest {
         // Then
         response.andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Found categories!")));
+                        CoreMatchers.is(MessageConstants.FOUND_CATEGORIES)));
 
         response.andExpect(MockMvcResultMatchers.jsonPath("$.data", hasSize(2)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].name",
@@ -329,7 +330,7 @@ public class CategoryControllerTest {
         // Then
         response.andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Found categories!")));
+                        CoreMatchers.is(MessageConstants.FOUND_CATEGORIES)));
 
         response.andExpect(MockMvcResultMatchers.jsonPath("$.data", hasSize(0)));
 
@@ -358,7 +359,7 @@ public class CategoryControllerTest {
         // Then
         response.andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Found category!")));
+                        CoreMatchers.is(MessageConstants.FOUND_CATEGORY)));
 
         response.andExpect(MockMvcResultMatchers.jsonPath("$.data[0].id")
                         .value(1))
@@ -372,7 +373,7 @@ public class CategoryControllerTest {
     public void get_NonExistingCategory_Return_IsNotFound() throws Exception {
         //Given
         given(categoryService.findById(anyInt()))
-                .willThrow(new DataNotFoundException("Category not found!"));
+                .willThrow(new DataNotFoundException(MessageConstants.CATEGORY_NOT_FOUND));
 
         // When
         ResultActions response = mockMvc.perform(get(url + "/get/{id}", 100));
@@ -380,7 +381,7 @@ public class CategoryControllerTest {
         // Then
         response.andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.errors[0]",
-                        CoreMatchers.is("Category not found!")));
+                        CoreMatchers.is(MessageConstants.CATEGORY_NOT_FOUND)));
     }
 
     @Test
@@ -406,7 +407,7 @@ public class CategoryControllerTest {
         // Then
         response.andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Saved category!")));
+                        CoreMatchers.is(MessageConstants.SAVED_CATEGORY)));
 
         response.andExpect(MockMvcResultMatchers.jsonPath("$.data[0].name",
                 CoreMatchers.is("Vinos")));
@@ -416,7 +417,7 @@ public class CategoryControllerTest {
     public void save_ExistingCategory_Return_IsConflict() throws Exception {
         // Given
         given(categoryService.save(any(CategoryGenericRequestDto.class)))
-                .willThrow(new DataAlreadyExistsException("Category already exists!"));
+                .willThrow(new DataAlreadyExistsException(MessageConstants.CATEGORY_ALREADY_EXISTS));
 
         // When
         ResultActions response = mockMvc.perform(post(url + "/save")
@@ -426,7 +427,7 @@ public class CategoryControllerTest {
         // Then
         response.andExpect(MockMvcResultMatchers.status().isConflict())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.errors[0]",
-                        CoreMatchers.is("Category already exists!")));
+                        CoreMatchers.is(MessageConstants.CATEGORY_ALREADY_EXISTS)));
     }
 
     @Test
@@ -458,7 +459,7 @@ public class CategoryControllerTest {
         // Then
         response.andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Updated category!")));
+                        CoreMatchers.is(MessageConstants.UPDATED_CATEGORY)));
 
         response.andExpect(MockMvcResultMatchers.jsonPath("$.data[0].name",
                 CoreMatchers.is("Vinos y Licores")));
@@ -468,7 +469,7 @@ public class CategoryControllerTest {
     public void update_NonExistingCategory_Return_IsNotFound() throws Exception {
         // Given
         given(categoryService.update(anyInt(), any(CategoryGenericRequestDto.class)))
-                .willThrow(new DataNotFoundException("Category does not exist!"));
+                .willThrow(new DataNotFoundException(MessageConstants.CATEGORY_NOT_FOUND));
 
         // When
         ResultActions response = mockMvc.perform(put(url + "/update/{id}", 100)
@@ -478,7 +479,7 @@ public class CategoryControllerTest {
         // Then
         response.andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.errors[0]",
-                        CoreMatchers.is("Category does not exist!")));
+                        CoreMatchers.is(MessageConstants.CATEGORY_NOT_FOUND)));
     }
 
     @Test
@@ -492,7 +493,7 @@ public class CategoryControllerTest {
         // Then
         response.andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Deleted category!")));
+                        CoreMatchers.is(MessageConstants.DELETED_CATEGORY)));
     }
 
     private static CategoryGenericResponseDto mapRequestDtoToResponseDto(

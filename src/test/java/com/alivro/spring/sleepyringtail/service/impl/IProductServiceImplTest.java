@@ -1,5 +1,6 @@
 package com.alivro.spring.sleepyringtail.service.impl;
 
+import com.alivro.spring.sleepyringtail.constants.MessageConstants;
 import com.alivro.spring.sleepyringtail.dao.ProductDao;
 import com.alivro.spring.sleepyringtail.exception.DataAlreadyExistsException;
 import com.alivro.spring.sleepyringtail.exception.DataNotFoundException;
@@ -437,7 +438,7 @@ public class IProductServiceImplTest {
                 () -> productService.findById(100));
 
         // Then
-        MatcherAssert.assertThat(thrown.getMessage(), is("Product not found!"));
+        MatcherAssert.assertThat(thrown.getMessage(), is(MessageConstants.PRODUCT_NOT_FOUND));
     }
 
     @Test
@@ -469,7 +470,7 @@ public class IProductServiceImplTest {
                 () -> productService.save(vacaCocolateSaveRequest));
 
         // Then
-        MatcherAssert.assertThat(thrown.getMessage(), is("Product already exists!"));
+        MatcherAssert.assertThat(thrown.getMessage(), is(MessageConstants.PRODUCT_ALREADY_EXISTS));
     }
 
     @Test
@@ -504,7 +505,7 @@ public class IProductServiceImplTest {
                 () -> productService.update(100, vacaChocolateUpdateRequest));
 
         // Then
-        MatcherAssert.assertThat(thrown.getMessage(), is("Product does not exist!"));
+        MatcherAssert.assertThat(thrown.getMessage(), is(MessageConstants.PRODUCT_NOT_FOUND));
     }
 
     @Test

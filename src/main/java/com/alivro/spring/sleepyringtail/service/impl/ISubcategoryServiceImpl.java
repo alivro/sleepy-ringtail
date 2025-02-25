@@ -1,5 +1,6 @@
 package com.alivro.spring.sleepyringtail.service.impl;
 
+import com.alivro.spring.sleepyringtail.constants.MessageConstants;
 import com.alivro.spring.sleepyringtail.dao.SubcategoryDao;
 import com.alivro.spring.sleepyringtail.exception.DataAlreadyExistsException;
 import com.alivro.spring.sleepyringtail.exception.DataNotFoundException;
@@ -23,9 +24,10 @@ import java.util.Optional;
 
 @Service
 public class ISubcategoryServiceImpl implements ISubcategoryService {
-    private final SubcategoryDao subcategoryDao;
-    private final ModelMapper modelMapper = new ModelMapper();
+    private static final String MESSAGE_FORMAT = "{} {}: {}";
     private final Logger logger = LoggerFactory.getLogger(ISubcategoryServiceImpl.class);
+    private final ModelMapper modelMapper = new ModelMapper();
+    private final SubcategoryDao subcategoryDao;
 
     /**
      * Constructor
@@ -44,7 +46,7 @@ public class ISubcategoryServiceImpl implements ISubcategoryService {
      */
     @Override
     public CustomPaginationData<SubcategoryGenericResponseDto, Subcategory> findAll(Pageable pageable) {
-        logger.info("Busca todas las subcategorías.");
+        logger.info(MessageConstants.FIND_ALL_SUBCATEGORIES);
 
         Page<Subcategory> subcategoriesPage = subcategoryDao.findAll(pageable);
 
@@ -65,7 +67,7 @@ public class ISubcategoryServiceImpl implements ISubcategoryService {
      */
     @Override
     public CustomPaginationData<SubcategoryGenericResponseDto, Subcategory> findAllByName(String word, Pageable pageable) {
-        logger.info("Busca todas las subcategorías.");
+        logger.info(MESSAGE_FORMAT, MessageConstants.FIND_ALL_SUBCATEGORIES, MessageConstants.NAME, word);
 
         Page<Subcategory> subcategoriesPage = subcategoryDao.findByNameContainingIgnoreCase(word, pageable);
 
@@ -85,14 +87,14 @@ public class ISubcategoryServiceImpl implements ISubcategoryService {
      */
     @Override
     public SubcategoryGetResponseDto findById(Integer id) {
-        logger.info("Busca subcategoría. ID: {}", id);
+        logger.info(MESSAGE_FORMAT, MessageConstants.FIND_SUBCATEGORY, MessageConstants.ID, id);
 
         Optional<Subcategory> foundSubcategory = subcategoryDao.findById(id);
 
         if (foundSubcategory.isEmpty()) {
-            logger.info("Subcategoría no encontrada. ID: {}", id);
+            logger.info(MessageConstants.SUBCATEGORY_NOT_FOUND);
 
-            throw new DataNotFoundException("Subcategory not found!");
+            throw new DataNotFoundException(MessageConstants.SUBCATEGORY_NOT_FOUND);
         }
 
         return modelMapper.map(foundSubcategory.get(), SubcategoryGetResponseDto.class);
@@ -108,18 +110,18 @@ public class ISubcategoryServiceImpl implements ISubcategoryService {
     public SubcategoryGenericResponseDto save(SubcategoryGenericRequestDto request) {
         String name = request.getName();
 
-        logger.info("Busca subcategoría. Nombre: {}", name);
+        logger.info(MESSAGE_FORMAT, MessageConstants.FIND_SUBCATEGORY, MessageConstants.NAME, name);
 
         // Verifica si ya existe una subcategoría con el mismo nombre
         if (subcategoryDao.existsByName(name)) {
-            logger.info("Subcategoría existente. Nombre: {}", name);
-            logger.info("Subcategoría no guardada. Nombre: {}", name);
+            logger.info(MessageConstants.SUBCATEGORY_ALREADY_EXISTS);
+            logger.info(MessageConstants.SUBCATEGORY_NOT_SAVED);
 
-            throw new DataAlreadyExistsException("Subcategory already exists!");
+            throw new DataAlreadyExistsException(MessageConstants.SUBCATEGORY_ALREADY_EXISTS);
         }
 
-        logger.info("Subcategoría no existente. Nombre: {}", name);
-        logger.info("Guarda subcategoría. Nombre: {}", name);
+        logger.info(MessageConstants.SUBCATEGORY_NOT_FOUND);
+        logger.info(MessageConstants.SAVE_SUBCATEGORY);
 
         // Guarda la información de la nueva subcategoría
         Subcategory savedSubcategory = subcategoryDao.save(
@@ -138,16 +140,16 @@ public class ISubcategoryServiceImpl implements ISubcategoryService {
      */
     @Override
     public SubcategoryGenericResponseDto update(Integer id, SubcategoryGenericRequestDto request) {
-        logger.info("Busca subcategoría. ID: {}", id);
+        logger.info(MESSAGE_FORMAT, MessageConstants.FIND_SUBCATEGORY, MessageConstants.ID, id);
 
         Optional<Subcategory> foundSubcategory = subcategoryDao.findById(id);
 
-        // Verifica si existe una subcategoría con ese id
+        // Verifica si existe una subcategoría con el ID dado
         if (foundSubcategory.isEmpty()) {
-            logger.info("Subcategoría no existente. ID: {}", id);
-            logger.info("Subcategoría no actualizada. ID: {}", id);
+            logger.info(MessageConstants.SUBCATEGORY_NOT_FOUND);
+            logger.info(MessageConstants.SUBCATEGORY_NOT_UPDATED);
 
-            throw new DataNotFoundException("Subcategory does not exist!");
+            throw new DataNotFoundException(MessageConstants.SUBCATEGORY_NOT_FOUND);
         }
 
         // Información de la subcategoría a actualizar
@@ -158,7 +160,8 @@ public class ISubcategoryServiceImpl implements ISubcategoryService {
         categoryToUpdate.setDescription(request.getDescription());
         categoryToUpdate.setCategory(category);
 
-        logger.info("Actualiza subcategoría. ID: {}", id);
+        logger.info(MessageConstants.SUBCATEGORY_EXISTS);
+        logger.info(MessageConstants.UPDATE_SUBCATEGORY);
 
         // Actualiza la información de la subcategoría
         Subcategory updatedSubcategory = subcategoryDao.save(categoryToUpdate);
@@ -173,7 +176,7 @@ public class ISubcategoryServiceImpl implements ISubcategoryService {
      */
     @Override
     public void deleteById(Integer id) {
-        logger.info("Elimina subcategoría. ID: {}", id);
+        logger.info(MESSAGE_FORMAT, MessageConstants.DELETE_SUBCATEGORY, MessageConstants.ID, id);
 
         subcategoryDao.deleteById(id);
     }

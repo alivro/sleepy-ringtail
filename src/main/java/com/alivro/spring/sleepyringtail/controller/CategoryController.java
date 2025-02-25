@@ -1,5 +1,6 @@
 package com.alivro.spring.sleepyringtail.controller;
 
+import com.alivro.spring.sleepyringtail.constants.MessageConstants;
 import com.alivro.spring.sleepyringtail.handler.ResponseHandler;
 import com.alivro.spring.sleepyringtail.model.Category;
 import com.alivro.spring.sleepyringtail.model.category.request.CategoryGenericRequestDto;
@@ -24,8 +25,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/category")
 @CrossOrigin(origins = "http://localhost:4200")
 public class CategoryController {
-    private final ICategoryService categoryService;
     private final Logger logger = LoggerFactory.getLogger(CategoryController.class);
+    private final ICategoryService categoryService;
 
     /**
      * Constructor
@@ -49,10 +50,10 @@ public class CategoryController {
         CustomPaginationData<CategoryGenericResponseDto, Category> categoriesData =
                 categoryService.findAll(pageable);
 
-        logger.info("Categorías encontradas.");
+        logger.info(MessageConstants.FOUND_CATEGORIES);
 
         return ResponseHandler.sendResponse(
-                HttpStatus.OK, "Found categories!", categoriesData.getData(), categoriesData.getMetadata()
+                HttpStatus.OK, MessageConstants.FOUND_CATEGORIES, categoriesData.getData(), categoriesData.getMetadata()
         );
     }
 
@@ -71,10 +72,10 @@ public class CategoryController {
         CustomPaginationData<CategoryGenericResponseDto, Category> categoriesData =
                 categoryService.findAllByName(word, pageable);
 
-        logger.info("Categorías encontradas.");
+        logger.info(MessageConstants.FOUND_CATEGORIES);
 
         return ResponseHandler.sendResponse(
-                HttpStatus.OK, "Found categories!", categoriesData.getData(), categoriesData.getMetadata()
+                HttpStatus.OK, MessageConstants.FOUND_CATEGORIES, categoriesData.getData(), categoriesData.getMetadata()
         );
     }
 
@@ -88,10 +89,10 @@ public class CategoryController {
     public ResponseEntity<CustomResponse<CategoryGetResponseDto, Void>> getCategory(@PathVariable("id") Integer id) {
         CategoryGetResponseDto foundCategory = categoryService.findById(id);
 
-        logger.info("Categoría encontrada. ID: {}", id);
+        logger.info(MessageConstants.FOUND_CATEGORY);
 
         return ResponseHandler.sendResponse(
-                HttpStatus.OK, "Found category!", foundCategory
+                HttpStatus.OK, MessageConstants.FOUND_CATEGORY, foundCategory
         );
     }
 
@@ -106,10 +107,10 @@ public class CategoryController {
             @Valid @RequestBody CategoryGenericRequestDto request) {
         CategoryGenericResponseDto savedCategory = categoryService.save(request);
 
-        logger.info("Categoría guardada. ID: {}", savedCategory.getId());
+        logger.info(MessageConstants.SAVED_CATEGORY);
 
         return ResponseHandler.sendResponse(
-                HttpStatus.CREATED, "Saved category!", savedCategory
+                HttpStatus.CREATED, MessageConstants.SAVED_CATEGORY, savedCategory
         );
     }
 
@@ -125,10 +126,10 @@ public class CategoryController {
             @PathVariable("id") Integer id, @Valid @RequestBody CategoryGenericRequestDto request) {
         CategoryGenericResponseDto updatedCategory = categoryService.update(id, request);
 
-        logger.info("Categoría actualizada. ID: {}", id);
+        logger.info(MessageConstants.UPDATED_CATEGORY);
 
         return ResponseHandler.sendResponse(
-                HttpStatus.OK, "Updated category!", updatedCategory
+                HttpStatus.OK, MessageConstants.UPDATED_CATEGORY, updatedCategory
         );
     }
 
@@ -142,10 +143,10 @@ public class CategoryController {
     public ResponseEntity<CustomResponse<Void, Void>> deleteCategory(@PathVariable("id") Integer id) {
         categoryService.deleteById(id);
 
-        logger.info("Categoría eliminada. ID: {}", id);
+        logger.info(MessageConstants.DELETED_CATEGORY);
 
         return ResponseHandler.sendResponse(
-                HttpStatus.OK, "Deleted category!"
+                HttpStatus.OK, MessageConstants.DELETED_CATEGORY
         );
     }
 }

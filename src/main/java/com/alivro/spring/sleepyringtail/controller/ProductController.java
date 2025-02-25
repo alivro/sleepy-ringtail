@@ -1,5 +1,6 @@
 package com.alivro.spring.sleepyringtail.controller;
 
+import com.alivro.spring.sleepyringtail.constants.MessageConstants;
 import com.alivro.spring.sleepyringtail.handler.ResponseHandler;
 import com.alivro.spring.sleepyringtail.model.Product;
 import com.alivro.spring.sleepyringtail.model.product.request.ProductGenericRequestDto;
@@ -24,8 +25,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/product")
 @CrossOrigin(origins = "http://localhost:4200")
 public class ProductController {
-    private final IProductService productService;
     private final Logger logger = LoggerFactory.getLogger(ProductController.class);
+    private final IProductService productService;
 
     /**
      * Constructor
@@ -48,10 +49,10 @@ public class ProductController {
             Pageable pageable) {
         CustomPaginationData<ProductGenericResponseDto, Product> productsData = productService.findAll(pageable);
 
-        logger.info("Productos encontrados.");
+        logger.info(MessageConstants.FOUND_PRODUCTS);
 
         return ResponseHandler.sendResponse(
-                HttpStatus.OK, "Found products!", productsData.getData(), productsData.getMetadata()
+                HttpStatus.OK, MessageConstants.FOUND_PRODUCTS, productsData.getData(), productsData.getMetadata()
         );
     }
 
@@ -70,10 +71,10 @@ public class ProductController {
         CustomPaginationData<ProductGenericResponseDto, Product> productsData =
                 productService.findAllByName(word, pageable);
 
-        logger.info("Productos encontrados.");
+        logger.info(MessageConstants.FOUND_PRODUCTS);
 
         return ResponseHandler.sendResponse(
-                HttpStatus.OK, "Found products!", productsData.getData(), productsData.getMetadata()
+                HttpStatus.OK, MessageConstants.FOUND_PRODUCTS, productsData.getData(), productsData.getMetadata()
         );
     }
 
@@ -92,10 +93,10 @@ public class ProductController {
         CustomPaginationData<ProductGenericResponseDto, Product> productsData =
                 productService.findAllByDescription(word, pageable);
 
-        logger.info("Productos encontrados.");
+        logger.info(MessageConstants.FOUND_PRODUCTS);
 
         return ResponseHandler.sendResponse(
-                HttpStatus.OK, "Found products!", productsData.getData(), productsData.getMetadata()
+                HttpStatus.OK, MessageConstants.FOUND_PRODUCTS, productsData.getData(), productsData.getMetadata()
         );
     }
 
@@ -109,10 +110,10 @@ public class ProductController {
     public ResponseEntity<CustomResponse<ProductGetResponseDto, Void>> getProduct(@PathVariable("id") Integer id) {
         ProductGetResponseDto foundProduct = productService.findById(id);
 
-        logger.info("Producto encontrado. ID: {}", id);
+        logger.info(MessageConstants.FOUND_PRODUCT);
 
         return ResponseHandler.sendResponse(
-                HttpStatus.OK, "Found product!", foundProduct
+                HttpStatus.OK, MessageConstants.FOUND_PRODUCT, foundProduct
         );
     }
 
@@ -127,10 +128,10 @@ public class ProductController {
             @Valid @RequestBody ProductGenericRequestDto request) {
         ProductGenericResponseDto savedProduct = productService.save(request);
 
-        logger.info("Producto guardado. ID: {}", savedProduct.getId());
+        logger.info(MessageConstants.SAVED_PRODUCT);
 
         return ResponseHandler.sendResponse(
-                HttpStatus.CREATED, "Saved product!", savedProduct
+                HttpStatus.CREATED, MessageConstants.SAVED_PRODUCT, savedProduct
         );
     }
 
@@ -146,10 +147,10 @@ public class ProductController {
             @PathVariable("id") Integer id, @Valid @RequestBody ProductGenericRequestDto request) {
         ProductGenericResponseDto updatedProduct = productService.update(id, request);
 
-        logger.info("Producto actualizado. ID: {}", id);
+        logger.info(MessageConstants.UPDATED_PRODUCT);
 
         return ResponseHandler.sendResponse(
-                HttpStatus.OK, "Updated product!", updatedProduct
+                HttpStatus.OK, MessageConstants.UPDATED_PRODUCT, updatedProduct
         );
     }
 
@@ -163,10 +164,10 @@ public class ProductController {
     public ResponseEntity<CustomResponse<Void, Void>> deleteProduct(@PathVariable("id") Integer id) {
         productService.deleteById(id);
 
-        logger.info("Producto eliminado. ID: {}", id);
+        logger.info(MessageConstants.DELETED_PRODUCT);
 
         return ResponseHandler.sendResponse(
-                HttpStatus.OK, "Deleted product!"
+                HttpStatus.OK, MessageConstants.DELETED_PRODUCT
         );
     }
 }

@@ -1,5 +1,6 @@
 package com.alivro.spring.sleepyringtail.controller;
 
+import com.alivro.spring.sleepyringtail.constants.MessageConstants;
 import com.alivro.spring.sleepyringtail.exception.DataAlreadyExistsException;
 import com.alivro.spring.sleepyringtail.exception.DataNotFoundException;
 import com.alivro.spring.sleepyringtail.model.Subcategory;
@@ -209,7 +210,7 @@ public class SubcategoryControllerTest {
         // Then
         response.andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Found subcategories!")));
+                        CoreMatchers.is(MessageConstants.FOUND_SUBCATEGORIES)));
 
         response.andExpect(MockMvcResultMatchers.jsonPath("$.data", hasSize(4)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].name",
@@ -266,7 +267,7 @@ public class SubcategoryControllerTest {
         // Then
         response.andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Found subcategories!")));
+                        CoreMatchers.is(MessageConstants.FOUND_SUBCATEGORIES)));
 
         response.andExpect(MockMvcResultMatchers.jsonPath("$.data", hasSize(0)));
 
@@ -322,7 +323,7 @@ public class SubcategoryControllerTest {
         // Then
         response.andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Found subcategories!")));
+                        CoreMatchers.is(MessageConstants.FOUND_SUBCATEGORIES)));
 
         response.andExpect(MockMvcResultMatchers.jsonPath("$.data", hasSize(2)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].name",
@@ -376,7 +377,7 @@ public class SubcategoryControllerTest {
         // Then
         response.andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Found subcategories!")));
+                        CoreMatchers.is(MessageConstants.FOUND_SUBCATEGORIES)));
 
         response.andExpect(MockMvcResultMatchers.jsonPath("$.data", hasSize(0)));
 
@@ -405,7 +406,7 @@ public class SubcategoryControllerTest {
         // Then
         response.andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Found subcategory!")));
+                        CoreMatchers.is(MessageConstants.FOUND_SUBCATEGORY)));
 
         response.andExpect(MockMvcResultMatchers.jsonPath("$.data[0].id")
                         .value(1))
@@ -425,7 +426,7 @@ public class SubcategoryControllerTest {
         Integer subcategoryId = 100;
 
         given(subcategoryService.findById(subcategoryId))
-                .willThrow(new DataNotFoundException("Subcategory not found!"));
+                .willThrow(new DataNotFoundException(MessageConstants.SUBCATEGORY_NOT_FOUND));
 
         // When
         ResultActions response = mockMvc.perform(get(url + "/get/{id}", 100));
@@ -433,7 +434,7 @@ public class SubcategoryControllerTest {
         // Then
         response.andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.errors[0]",
-                        CoreMatchers.is("Subcategory not found!")));
+                        CoreMatchers.is(MessageConstants.SUBCATEGORY_NOT_FOUND)));
     }
 
     @Test
@@ -459,7 +460,7 @@ public class SubcategoryControllerTest {
         // Then
         response.andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Saved subcategory!")));
+                        CoreMatchers.is(MessageConstants.SAVED_SUBCATEGORY)));
 
         response.andExpect(MockMvcResultMatchers.jsonPath("$.data[0].name",
                 CoreMatchers.is("Gomitas")));
@@ -469,7 +470,7 @@ public class SubcategoryControllerTest {
     public void save_ExistingSubcategory_Return_IsConflict() throws Exception {
         // Given
         given(subcategoryService.save(any(SubcategoryGenericRequestDto.class)))
-                .willThrow(new DataAlreadyExistsException("Subcategory already exists!"));
+                .willThrow(new DataAlreadyExistsException(MessageConstants.SUBCATEGORY_ALREADY_EXISTS));
 
         // When
         ResultActions response = mockMvc.perform(post(url + "/save")
@@ -479,7 +480,7 @@ public class SubcategoryControllerTest {
         // Then
         response.andExpect(MockMvcResultMatchers.status().isConflict())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.errors[0]",
-                        CoreMatchers.is("Subcategory already exists!")));
+                        CoreMatchers.is(MessageConstants.SUBCATEGORY_ALREADY_EXISTS)));
     }
 
     @Test
@@ -511,7 +512,7 @@ public class SubcategoryControllerTest {
         // Then
         response.andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Updated subcategory!")));
+                        CoreMatchers.is(MessageConstants.UPDATED_SUBCATEGORY)));
 
         response.andExpect(MockMvcResultMatchers.jsonPath("$.data[0].name",
                 CoreMatchers.is("Caramelos de goma")));
@@ -521,7 +522,7 @@ public class SubcategoryControllerTest {
     public void update_NonExistingSubcategory_Return_IsNotFound() throws Exception {
         // Given
         given(subcategoryService.update(anyInt(), any(SubcategoryGenericRequestDto.class)))
-                .willThrow(new DataNotFoundException("Subcategory does not exist!"));
+                .willThrow(new DataNotFoundException(MessageConstants.SUBCATEGORY_NOT_FOUND));
 
         // When
         ResultActions response = mockMvc.perform(put(url + "/update/{id}", 100)
@@ -531,7 +532,7 @@ public class SubcategoryControllerTest {
         // Then
         response.andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.errors[0]",
-                        CoreMatchers.is("Subcategory does not exist!")));
+                        CoreMatchers.is(MessageConstants.SUBCATEGORY_NOT_FOUND)));
     }
 
     @Test
@@ -545,7 +546,7 @@ public class SubcategoryControllerTest {
         // Then
         response.andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Deleted subcategory!")));
+                        CoreMatchers.is(MessageConstants.DELETED_SUBCATEGORY)));
     }
 
     private static SubcategoryGenericResponseDto mapRequestDtoToResponseDto(

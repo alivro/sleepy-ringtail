@@ -1,5 +1,6 @@
 package com.alivro.spring.sleepyringtail.service.impl;
 
+import com.alivro.spring.sleepyringtail.constants.MessageConstants;
 import com.alivro.spring.sleepyringtail.dao.CategoryDao;
 import com.alivro.spring.sleepyringtail.exception.DataAlreadyExistsException;
 import com.alivro.spring.sleepyringtail.exception.DataNotFoundException;
@@ -22,9 +23,10 @@ import java.util.Optional;
 
 @Service
 public class ICategoryServiceImpl implements ICategoryService {
-    private final CategoryDao categoryDao;
-    private final ModelMapper modelMapper = new ModelMapper();
+    private static final String MESSAGE_FORMAT = "{} {}: {}";
     private final Logger logger = LoggerFactory.getLogger(ICategoryServiceImpl.class);
+    private final ModelMapper modelMapper = new ModelMapper();
+    private final CategoryDao categoryDao;
 
     /**
      * Constructor
@@ -44,7 +46,7 @@ public class ICategoryServiceImpl implements ICategoryService {
      */
     @Override
     public CustomPaginationData<CategoryGenericResponseDto, Category> findAll(Pageable pageable) {
-        logger.info("Busca todas las categorías.");
+        logger.info(MessageConstants.FIND_ALL_CATEGORIES);
 
         Page<Category> categoriesPage = categoryDao.findAll(pageable);
 
@@ -65,7 +67,7 @@ public class ICategoryServiceImpl implements ICategoryService {
      */
     @Override
     public CustomPaginationData<CategoryGenericResponseDto, Category> findAllByName(String word, Pageable pageable) {
-        logger.info("Busca todas las categorías.");
+        logger.info(MESSAGE_FORMAT, MessageConstants.FIND_ALL_CATEGORIES, MessageConstants.NAME, word);
 
         Page<Category> categoriesPage = categoryDao.findByNameContainingIgnoreCase(word, pageable);
 
@@ -85,14 +87,14 @@ public class ICategoryServiceImpl implements ICategoryService {
      */
     @Override
     public CategoryGetResponseDto findById(Integer id) {
-        logger.info("Busca categoría. ID: {}", id);
+        logger.info(MESSAGE_FORMAT, MessageConstants.FIND_CATEGORY, MessageConstants.ID, id);
 
         Optional<Category> foundCategory = categoryDao.findById(id);
 
         if (foundCategory.isEmpty()) {
-            logger.info("Categoría no encontrada. ID: {}", id);
+            logger.info(MessageConstants.CATEGORY_NOT_FOUND);
 
-            throw new DataNotFoundException("Category not found!");
+            throw new DataNotFoundException(MessageConstants.CATEGORY_NOT_FOUND);
         }
 
         return modelMapper.map(foundCategory.get(), CategoryGetResponseDto.class);
@@ -108,18 +110,18 @@ public class ICategoryServiceImpl implements ICategoryService {
     public CategoryGenericResponseDto save(CategoryGenericRequestDto request) {
         String name = request.getName();
 
-        logger.info("Busca categoría. Nombre: {}", name);
+        logger.info(MESSAGE_FORMAT, MessageConstants.FIND_CATEGORY, MessageConstants.NAME, name);
 
         // Verifica si ya existe una categoría con el mismo nombre
         if (categoryDao.existsByName(name)) {
-            logger.info("Categoría existente. Nombre: {}", name);
-            logger.info("Categoría no guardada. Nombre: {}", name);
+            logger.info(MessageConstants.CATEGORY_ALREADY_EXISTS);
+            logger.info(MessageConstants.CATEGORY_NOT_SAVED);
 
-            throw new DataAlreadyExistsException("Category already exists!");
+            throw new DataAlreadyExistsException(MessageConstants.CATEGORY_ALREADY_EXISTS);
         }
 
-        logger.info("Categoría no existente. Nombre: {}", name);
-        logger.info("Guarda categoría. Nombre: {}", name);
+        logger.info(MessageConstants.CATEGORY_NOT_FOUND);
+        logger.info(MessageConstants.SAVE_CATEGORY);
 
         // Guarda la información de la nueva categoría
         Category savedCategory = categoryDao.save(
@@ -138,16 +140,16 @@ public class ICategoryServiceImpl implements ICategoryService {
      */
     @Override
     public CategoryGenericResponseDto update(Integer id, CategoryGenericRequestDto request) {
-        logger.info("Busca categoría. ID: {}", id);
+        logger.info(MESSAGE_FORMAT, MessageConstants.FIND_CATEGORY, MessageConstants.ID, id);
 
         Optional<Category> foundCategory = categoryDao.findById(id);
 
-        // Verifica si existe una categoría con ese id
+        // Verifica si existe una subcategoría con el ID dado
         if (foundCategory.isEmpty()) {
-            logger.info("Categoría no existente. ID: {}", id);
-            logger.info("Categoría no actualizada. ID: {}", id);
+            logger.info(MessageConstants.CATEGORY_NOT_FOUND);
+            logger.info(MessageConstants.CATEGORY_NOT_UPDATED);
 
-            throw new DataNotFoundException("Category does not exist!");
+            throw new DataNotFoundException(MessageConstants.CATEGORY_NOT_FOUND);
         }
 
         // Información de la categoría a actualizar
@@ -155,7 +157,8 @@ public class ICategoryServiceImpl implements ICategoryService {
         categoryToUpdate.setName(request.getName());
         categoryToUpdate.setDescription(request.getDescription());
 
-        logger.info("Actualiza categoría. ID: {}", id);
+        logger.info(MessageConstants.CATEGORY_EXISTS);
+        logger.info(MessageConstants.UPDATE_CATEGORY);
 
         // Actualiza la información de la categoría
         Category updatedCategory = categoryDao.save(categoryToUpdate);
@@ -170,7 +173,7 @@ public class ICategoryServiceImpl implements ICategoryService {
      */
     @Override
     public void deleteById(Integer id) {
-        logger.info("Elimina categoría. ID: {}", id);
+        logger.info("{} ID: {}", MessageConstants.DELETE_CATEGORY, id);
 
         categoryDao.deleteById(id);
     }

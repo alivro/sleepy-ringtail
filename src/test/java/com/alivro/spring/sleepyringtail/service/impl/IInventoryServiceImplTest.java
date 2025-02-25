@@ -1,5 +1,6 @@
 package com.alivro.spring.sleepyringtail.service.impl;
 
+import com.alivro.spring.sleepyringtail.constants.MessageConstants;
 import com.alivro.spring.sleepyringtail.dao.InventoryDao;
 import com.alivro.spring.sleepyringtail.exception.DataAlreadyExistsException;
 import com.alivro.spring.sleepyringtail.exception.DataNotFoundException;
@@ -44,18 +45,18 @@ public class IInventoryServiceImplTest {
     @InjectMocks
     private IInventoryServiceImpl inventoryService;
 
-    // Buscar el stock de todos los productos
+    // Buscar el inventario de todos los productos
     private static Inventory ardillasSaladas;
     private static Inventory estrellaMarina;
     private static Inventory osoAlmendrado;
     private static Inventory vacaNapolitana;
 
-    // Guardar el stock de un nuevo producto
+    // Guardar el inventario de un nuevo producto
     private static InventoryGenericRequestDto vacaChocolateSaveRequest;
     private static Inventory vacaChocolateToSave;
     private static Inventory vacaChocolateSaved;
 
-    // Actualizar un stock existente
+    // Actualizar el inventario de un producto existente
     private static InventoryGenericRequestDto vacaChocolateUpdateRequest;
     private static Inventory vacaChocolateToUpdate;
     private static Inventory vacaChocolateUpdated;
@@ -64,7 +65,7 @@ public class IInventoryServiceImplTest {
     public static void setup() {
         ModelMapper modelMapper = new ModelMapper();
 
-        // Buscar el stock de todos los productos
+        // Buscar el inventario de todos los productos
         Product ardillasSaladasProduct = Product.builder()
                 .id(1)
                 .name("Ardillas Saladas")
@@ -117,7 +118,7 @@ public class IInventoryServiceImplTest {
                 .product(vacaNapolitanaProduct)
                 .build();
 
-        // Guardar el stock de un nuevo producto
+        // Guardar el inventario de un nuevo producto
         ProductRequestDto vacaChocolateProductRequest = ProductRequestDto.builder()
                 .id(5)
                 .name("Vaca de Chocolate")
@@ -134,7 +135,7 @@ public class IInventoryServiceImplTest {
 
         vacaChocolateSaved = vacaChocolateToSave.toBuilder().id(5).build();
 
-        // Actualizar un stock existente
+        // Actualizar el inventario de un producto existente
         vacaChocolateUpdateRequest = InventoryGenericRequestDto.builder()
                 .quantityAvailable((short) 150)
                 .minimumStock((short) 100)
@@ -148,7 +149,7 @@ public class IInventoryServiceImplTest {
     }
 
     @Test
-    public void findAll_OrderByQuantityAvailableDesc_ExistingInventory_Return_ListOfInventoryStocks() {
+    public void findAll_OrderByQuantityAvailableDesc_ExistingInventory_Return_ListOfInventory() {
         // Given
         int pageNumber = 0;
         int pageSize = 5;
@@ -191,7 +192,7 @@ public class IInventoryServiceImplTest {
     }
 
     @Test
-    public void findAll_NonExistingInventory_Return_EmptyListOfInventoryStocks() {
+    public void findAll_NonExistingInventory_Return_EmptyListOfInventory() {
         int pageNumber = 0;
         int pageSize = 5;
         String sortBy = "id";
@@ -225,22 +226,22 @@ public class IInventoryServiceImplTest {
     }
 
     @Test
-    public void findById_ExistingInventory_Return_FoundInventoryStock() {
+    public void findById_ExistingInventory_Return_FoundInventory() {
         // Given
         Integer inventoryId = 1;
 
         given(inventoryDao.findById(inventoryId)).willReturn(Optional.of(ardillasSaladas));
 
         // When
-        InventoryGenericResponseDto foundInventoryStock = inventoryService.findById(1);
+        InventoryGenericResponseDto foundInventory = inventoryService.findById(1);
 
         // Then
-        assertThat(foundInventoryStock).isNotNull();
-        assertThat(foundInventoryStock.getId()).isEqualTo(1);
-        assertThat(foundInventoryStock.getQuantityAvailable()).isEqualTo((short) 322);
-        assertThat(foundInventoryStock.getMinimumStock()).isEqualTo((short) 250);
-        assertThat(foundInventoryStock.getMaximumStock()).isEqualTo((short) 625);
-        assertThat(foundInventoryStock.getProduct().getName()).isEqualTo("Ardillas Saladas");
+        assertThat(foundInventory).isNotNull();
+        assertThat(foundInventory.getId()).isEqualTo(1);
+        assertThat(foundInventory.getQuantityAvailable()).isEqualTo((short) 322);
+        assertThat(foundInventory.getMinimumStock()).isEqualTo((short) 250);
+        assertThat(foundInventory.getMaximumStock()).isEqualTo((short) 625);
+        assertThat(foundInventory.getProduct().getName()).isEqualTo("Ardillas Saladas");
     }
 
     @Test
@@ -253,24 +254,24 @@ public class IInventoryServiceImplTest {
                 () -> inventoryService.findById(100));
 
         // Then
-        MatcherAssert.assertThat(thrown.getMessage(), is("Product stock not found!"));
+        MatcherAssert.assertThat(thrown.getMessage(), is(MessageConstants.INVENTORY_NOT_FOUND));
     }
 
     @Test
-    public void save_NonExistingInventory_Return_SavedInventoryStock() {
+    public void save_NonExistingInventory_Return_SavedInventory() {
         // Given
         given(inventoryDao.existsByProductId(vacaChocolateSaveRequest.getProduct().getId())).willReturn(false);
         given(inventoryDao.save(vacaChocolateToSave)).willReturn(vacaChocolateSaved);
 
         // When
-        InventoryGenericResponseDto savedInventoryStock = inventoryService.save(vacaChocolateSaveRequest);
+        InventoryGenericResponseDto savedInventory = inventoryService.save(vacaChocolateSaveRequest);
 
         // Then
-        assertThat(savedInventoryStock).isNotNull();
-        assertThat(savedInventoryStock.getQuantityAvailable()).isEqualTo((short) 55);
-        assertThat(savedInventoryStock.getMinimumStock()).isEqualTo((short) 10);
-        assertThat(savedInventoryStock.getMaximumStock()).isEqualTo((short) 150);
-        assertThat(savedInventoryStock.getProduct().getName()).isEqualTo("Vaca de Chocolate");
+        assertThat(savedInventory).isNotNull();
+        assertThat(savedInventory.getQuantityAvailable()).isEqualTo((short) 55);
+        assertThat(savedInventory.getMinimumStock()).isEqualTo((short) 10);
+        assertThat(savedInventory.getMaximumStock()).isEqualTo((short) 150);
+        assertThat(savedInventory.getProduct().getName()).isEqualTo("Vaca de Chocolate");
     }
 
     @Test
@@ -283,11 +284,11 @@ public class IInventoryServiceImplTest {
                 () -> inventoryService.save(vacaChocolateSaveRequest));
 
         // Then
-        MatcherAssert.assertThat(thrown.getMessage(), is("Existing product stock!"));
+        MatcherAssert.assertThat(thrown.getMessage(), is(MessageConstants.INVENTORY_ALREADY_EXISTS));
     }
 
     @Test
-    public void update_ExistingInventory_Return_UpdatedInventoryStock() {
+    public void update_ExistingInventory_Return_UpdatedInventory() {
         // Given
         Integer productId = 5;
 
@@ -295,15 +296,15 @@ public class IInventoryServiceImplTest {
         given(inventoryDao.save(vacaChocolateToUpdate)).willReturn(vacaChocolateUpdated);
 
         // When
-        InventoryGenericResponseDto updatedInventoryStock = inventoryService.update(5, vacaChocolateUpdateRequest);
+        InventoryGenericResponseDto updatedInventory = inventoryService.update(5, vacaChocolateUpdateRequest);
 
         // Then
-        assertThat(updatedInventoryStock).isNotNull();
-        assertThat(updatedInventoryStock.getId()).isEqualTo(5);
-        assertThat(updatedInventoryStock.getQuantityAvailable()).isEqualTo((short) 150);
-        assertThat(updatedInventoryStock.getMinimumStock()).isEqualTo((short) 100);
-        assertThat(updatedInventoryStock.getMaximumStock()).isEqualTo((short) 250);
-        assertThat(updatedInventoryStock.getProduct().getName()).isEqualTo("Vaca de Chocolate");
+        assertThat(updatedInventory).isNotNull();
+        assertThat(updatedInventory.getId()).isEqualTo(5);
+        assertThat(updatedInventory.getQuantityAvailable()).isEqualTo((short) 150);
+        assertThat(updatedInventory.getMinimumStock()).isEqualTo((short) 100);
+        assertThat(updatedInventory.getMaximumStock()).isEqualTo((short) 250);
+        assertThat(updatedInventory.getProduct().getName()).isEqualTo("Vaca de Chocolate");
     }
 
     @Test
@@ -316,7 +317,7 @@ public class IInventoryServiceImplTest {
                 () -> inventoryService.update(100, vacaChocolateUpdateRequest));
 
         // Then
-        MatcherAssert.assertThat(thrown.getMessage(), is("Product stock does not exist!"));
+        MatcherAssert.assertThat(thrown.getMessage(), is(MessageConstants.INVENTORY_NOT_FOUND));
     }
 
     @Test

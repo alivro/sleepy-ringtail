@@ -1,5 +1,6 @@
 package com.alivro.spring.sleepyringtail.service.impl;
 
+import com.alivro.spring.sleepyringtail.constants.MessageConstants;
 import com.alivro.spring.sleepyringtail.dao.SubcategoryDao;
 import com.alivro.spring.sleepyringtail.exception.DataAlreadyExistsException;
 import com.alivro.spring.sleepyringtail.exception.DataNotFoundException;
@@ -336,7 +337,7 @@ public class ISubcategoryServiceImplTest {
                 () -> subcategoryService.findById(100));
 
         // Then
-        MatcherAssert.assertThat(thrown.getMessage(), is("Subcategory not found!"));
+        MatcherAssert.assertThat(thrown.getMessage(), is(MessageConstants.SUBCATEGORY_NOT_FOUND));
     }
 
     @Test
@@ -365,7 +366,7 @@ public class ISubcategoryServiceImplTest {
                 () -> subcategoryService.save(gomitasSaveRequest));
 
         // Then
-        MatcherAssert.assertThat(thrown.getMessage(), is("Subcategory already exists!"));
+        MatcherAssert.assertThat(thrown.getMessage(), is(MessageConstants.SUBCATEGORY_ALREADY_EXISTS));
     }
 
     @Test
@@ -397,7 +398,7 @@ public class ISubcategoryServiceImplTest {
                 () -> subcategoryService.update(100, gomitasUpdateRequest));
 
         // Then
-        MatcherAssert.assertThat(thrown.getMessage(), is("Subcategory does not exist!"));
+        MatcherAssert.assertThat(thrown.getMessage(), is(MessageConstants.SUBCATEGORY_NOT_FOUND));
     }
 
     @Test

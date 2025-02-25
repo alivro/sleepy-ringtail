@@ -1,5 +1,6 @@
 package com.alivro.spring.sleepyringtail.controller;
 
+import com.alivro.spring.sleepyringtail.constants.MessageConstants;
 import com.alivro.spring.sleepyringtail.handler.ResponseHandler;
 import com.alivro.spring.sleepyringtail.model.Subcategory;
 import com.alivro.spring.sleepyringtail.model.subcategory.request.SubcategoryGenericRequestDto;
@@ -24,8 +25,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/subcategory")
 @CrossOrigin(origins = "http://localhost:4200")
 public class SubcategoryController {
-    private final ISubcategoryService subcategoryService;
     private final Logger logger = LoggerFactory.getLogger(SubcategoryController.class);
+    private final ISubcategoryService subcategoryService;
 
     /**
      * Constructor
@@ -49,10 +50,10 @@ public class SubcategoryController {
         CustomPaginationData<SubcategoryGenericResponseDto, Subcategory> subcategoriesData =
                 subcategoryService.findAll(pageable);
 
-        logger.info("Subcategorías encontradas.");
+        logger.info(MessageConstants.FOUND_SUBCATEGORIES);
 
         return ResponseHandler.sendResponse(
-                HttpStatus.OK, "Found subcategories!", subcategoriesData.getData(), subcategoriesData.getMetadata()
+                HttpStatus.OK, MessageConstants.FOUND_SUBCATEGORIES, subcategoriesData.getData(), subcategoriesData.getMetadata()
         );
     }
 
@@ -71,10 +72,10 @@ public class SubcategoryController {
         CustomPaginationData<SubcategoryGenericResponseDto, Subcategory> subcategoriesData =
                 subcategoryService.findAllByName(word, pageable);
 
-        logger.info("Subcategorías encontradas.");
+        logger.info(MessageConstants.FOUND_SUBCATEGORIES);
 
         return ResponseHandler.sendResponse(
-                HttpStatus.OK, "Found subcategories!", subcategoriesData.getData(), subcategoriesData.getMetadata()
+                HttpStatus.OK, MessageConstants.FOUND_SUBCATEGORIES, subcategoriesData.getData(), subcategoriesData.getMetadata()
         );
     }
 
@@ -88,10 +89,10 @@ public class SubcategoryController {
     public ResponseEntity<CustomResponse<SubcategoryGetResponseDto, Void>> getSubcategory(@PathVariable("id") Integer id) {
         SubcategoryGetResponseDto foundSubcategory = subcategoryService.findById(id);
 
-        logger.info("Subcategoría encontrada. ID: {}", id);
+        logger.info(MessageConstants.FOUND_SUBCATEGORY);
 
         return ResponseHandler.sendResponse(
-                HttpStatus.OK, "Found subcategory!", foundSubcategory
+                HttpStatus.OK, MessageConstants.FOUND_SUBCATEGORY, foundSubcategory
         );
     }
 
@@ -106,10 +107,10 @@ public class SubcategoryController {
             @Valid @RequestBody SubcategoryGenericRequestDto request) {
         SubcategoryGenericResponseDto savedSubcategory = subcategoryService.save(request);
 
-        logger.info("Subcategoría guardada. ID: {}", savedSubcategory.getId());
+        logger.info(MessageConstants.SAVED_SUBCATEGORY);
 
         return ResponseHandler.sendResponse(
-                HttpStatus.CREATED, "Saved subcategory!", savedSubcategory
+                HttpStatus.CREATED, MessageConstants.SAVED_SUBCATEGORY, savedSubcategory
         );
     }
 
@@ -125,10 +126,10 @@ public class SubcategoryController {
             @PathVariable("id") Integer id, @Valid @RequestBody SubcategoryGenericRequestDto request) {
         SubcategoryGenericResponseDto updatedSubcategory = subcategoryService.update(id, request);
 
-        logger.info("Subcategoría actualizada. ID: {}", id);
+        logger.info(MessageConstants.UPDATED_SUBCATEGORY);
 
         return ResponseHandler.sendResponse(
-                HttpStatus.OK, "Updated subcategory!", updatedSubcategory
+                HttpStatus.OK, MessageConstants.UPDATED_SUBCATEGORY, updatedSubcategory
         );
     }
 
@@ -142,10 +143,10 @@ public class SubcategoryController {
     public ResponseEntity<CustomResponse<Void, Void>> deleteSubcategory(@PathVariable("id") Integer id) {
         subcategoryService.deleteById(id);
 
-        logger.info("Subcategoría eliminada. ID: {}", id);
+        logger.info(MessageConstants.DELETED_SUBCATEGORY);
 
         return ResponseHandler.sendResponse(
-                HttpStatus.OK, "Deleted subcategory!"
+                HttpStatus.OK, MessageConstants.DELETED_SUBCATEGORY
         );
     }
 }

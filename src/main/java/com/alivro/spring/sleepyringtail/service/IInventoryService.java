@@ -8,35 +8,35 @@ import org.springframework.data.domain.Pageable;
 
 public interface IInventoryService {
     /**
-     * Método para buscar el stock de todos los productos
+     * Método para buscar el inventario de todos los productos
      *
      * @param pageable Información de paginación
-     * @return Información del stock de todos los productos
+     * @return Información del inventario de todos los productos
      */
     CustomPaginationData<InventoryGenericResponseDto, Inventory> findAll(Pageable pageable);
 
     /**
-     * Método para buscar el stock de un producto por su ID
+     * Método para buscar el inventario de un producto por su ID
      *
      * @param id Identificador único del producto en el inventario
-     * @return Información del stock del producto buscado
+     * @return Información del inventario del producto buscado
      */
     InventoryGenericResponseDto findById(Integer id);
 
     /**
-     * Método para guardar la información del stock de un producto
+     * Método para guardar la información del inventario de un producto
      *
-     * @param request Información del stock del producto a guardar
-     * @return Información del stock del producto guardado
+     * @param request Información del inventario del producto a guardar
+     * @return Información del inventario del producto guardado
      */
     InventoryGenericResponseDto save(InventoryGenericRequestDto request);
 
     /**
-     * Método para actualizar la información del stock de un producto
+     * Método para actualizar la información del inventario de un producto
      *
      * @param id      Identificador único del producto en el inventario
-     * @param request Información del stock del producto a actualizar
-     * @return Información del stock del producto actualizado
+     * @param request Información del inventario del producto a actualizar
+     * @return Información del inventario del producto actualizado
      */
     InventoryGenericResponseDto update(Integer id, InventoryGenericRequestDto request);
 

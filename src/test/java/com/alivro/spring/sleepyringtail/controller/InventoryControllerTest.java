@@ -1,5 +1,6 @@
 package com.alivro.spring.sleepyringtail.controller;
 
+import com.alivro.spring.sleepyringtail.constants.MessageConstants;
 import com.alivro.spring.sleepyringtail.exception.DataAlreadyExistsException;
 import com.alivro.spring.sleepyringtail.exception.DataNotFoundException;
 import com.alivro.spring.sleepyringtail.model.Inventory;
@@ -168,23 +169,23 @@ public class InventoryControllerTest {
                 .withPage(pageNumber)
                 .withSort(Sort.by(sortBy).descending());
 
-        List<InventoryGenericResponseDto> foundInventoryStocks = new ArrayList<>();
-        foundInventoryStocks.add(ardillasSaladasResponse);
-        foundInventoryStocks.add(osoAlmendradoResponse);
-        foundInventoryStocks.add(estrellaMarinaResponse);
-        foundInventoryStocks.add(vacaNapolitanaResponse);
+        List<InventoryGenericResponseDto> foundInventory = new ArrayList<>();
+        foundInventory.add(ardillasSaladasResponse);
+        foundInventory.add(osoAlmendradoResponse);
+        foundInventory.add(estrellaMarinaResponse);
+        foundInventory.add(vacaNapolitanaResponse);
 
         CustomPageMetadata metadata = CustomPageMetadata.builder()
                 .pageNumber(pageNumber)
                 .pageSize(pageSize)
-                .numberOfElements(foundInventoryStocks.size())
-                .totalPages((int) Math.ceil((double) foundInventoryStocks.size() / pageSize))
-                .totalElements(foundInventoryStocks.size())
+                .numberOfElements(foundInventory.size())
+                .totalPages((int) Math.ceil((double) foundInventory.size() / pageSize))
+                .totalElements(foundInventory.size())
                 .build();
 
         given(inventoryService.findAll(pageable)).willReturn(
                 CustomPaginationData.<InventoryGenericResponseDto, Inventory>builder()
-                        .data(foundInventoryStocks)
+                        .data(foundInventory)
                         .metadata(metadata)
                         .build()
         );
@@ -199,7 +200,7 @@ public class InventoryControllerTest {
         // Then
         response.andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Found product stocks!")));
+                        CoreMatchers.is(MessageConstants.FOUND_ALL_INVENTORY)));
 
         response.andExpect(MockMvcResultMatchers.jsonPath("$.data", hasSize(4)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].quantityAvailable",
@@ -233,7 +234,7 @@ public class InventoryControllerTest {
                 .withPage(pageNumber)
                 .withSort(Sort.by(sortBy).ascending());
 
-        List<InventoryGenericResponseDto> foundInventoryStocks = new ArrayList<>();
+        List<InventoryGenericResponseDto> foundInventory = new ArrayList<>();
 
         CustomPageMetadata metadata = CustomPageMetadata.builder()
                 .pageNumber(pageNumber)
@@ -245,7 +246,7 @@ public class InventoryControllerTest {
 
         given(inventoryService.findAll(pageable)).willReturn(
                 CustomPaginationData.<InventoryGenericResponseDto, Inventory>builder()
-                        .data(foundInventoryStocks)
+                        .data(foundInventory)
                         .metadata(metadata)
                         .build()
         );
@@ -256,7 +257,7 @@ public class InventoryControllerTest {
         // Then
         response.andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Found product stocks!")));
+                        CoreMatchers.is(MessageConstants.FOUND_ALL_INVENTORY)));
 
         response.andExpect(MockMvcResultMatchers.jsonPath("$.data", hasSize(0)));
 
@@ -285,7 +286,7 @@ public class InventoryControllerTest {
         // Then
         response.andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Found product stock!")));
+                        CoreMatchers.is(MessageConstants.FOUND_INVENTORY)));
 
         response.andExpect(MockMvcResultMatchers.jsonPath("$.data[0].id")
                         .value(1))
@@ -305,7 +306,7 @@ public class InventoryControllerTest {
         Integer productId = 100;
 
         given(inventoryService.findById(productId))
-                .willThrow(new DataNotFoundException("Product stock not found!"));
+                .willThrow(new DataNotFoundException(MessageConstants.INVENTORY_NOT_FOUND));
 
         // When
         ResultActions response = mockMvc.perform(get(url + "/get/{id}", 100));
@@ -313,7 +314,7 @@ public class InventoryControllerTest {
         // Then
         response.andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.errors[0]",
-                        CoreMatchers.is("Product stock not found!")));
+                        CoreMatchers.is(MessageConstants.INVENTORY_NOT_FOUND)));
     }
 
     @Test
@@ -339,7 +340,7 @@ public class InventoryControllerTest {
         // Then
         response.andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Saved inventory stock!")));
+                        CoreMatchers.is(MessageConstants.SAVED_INVENTORY)));
 
         response.andExpect(MockMvcResultMatchers.jsonPath("$.data[0].quantityAvailable",
                         CoreMatchers.is(55)))
@@ -355,7 +356,7 @@ public class InventoryControllerTest {
     public void save_ExistingInventory_Return_IsConflict() throws Exception {
         // Given
         given(inventoryService.save(any(InventoryGenericRequestDto.class)))
-                .willThrow(new DataAlreadyExistsException("Existing product stock!"));
+                .willThrow(new DataAlreadyExistsException(MessageConstants.INVENTORY_ALREADY_EXISTS));
 
         // When
         ResultActions response = mockMvc.perform(post(url + "/save")
@@ -365,7 +366,7 @@ public class InventoryControllerTest {
         // Then
         response.andExpect(MockMvcResultMatchers.status().isConflict())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.errors[0]",
-                        CoreMatchers.is("Existing product stock!")));
+                        CoreMatchers.is(MessageConstants.INVENTORY_ALREADY_EXISTS)));
     }
 
     @Test
@@ -397,7 +398,7 @@ public class InventoryControllerTest {
         // Then
         response.andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Updated stock product!")));
+                        CoreMatchers.is(MessageConstants.UPDATED_INVENTORY)));
 
         response.andExpect(MockMvcResultMatchers.jsonPath("$.data[0].id")
                         .value(5))
@@ -415,7 +416,7 @@ public class InventoryControllerTest {
     public void update_NonExistingInventory_Return_IsNotFound() throws Exception {
         // Given
         given(inventoryService.update(anyInt(), any(InventoryGenericRequestDto.class)))
-                .willThrow(new DataNotFoundException("Product stock does not exist!"));
+                .willThrow(new DataNotFoundException(MessageConstants.INVENTORY_NOT_FOUND));
 
         // When
         ResultActions response = mockMvc.perform(put(url + "/update/{id}", 100)
@@ -425,7 +426,7 @@ public class InventoryControllerTest {
         // Then
         response.andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.errors[0]",
-                        CoreMatchers.is("Product stock does not exist!")));
+                        CoreMatchers.is(MessageConstants.INVENTORY_NOT_FOUND)));
     }
 
     @Test
@@ -439,7 +440,7 @@ public class InventoryControllerTest {
         // Then
         response.andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Deleted product stock!")));
+                        CoreMatchers.is(MessageConstants.DELETED_INVENTORY)));
     }
 
     private static InventoryGenericResponseDto mapRequestDtoToResponseDto(Integer id, InventoryGenericRequestDto request) {

@@ -1,5 +1,6 @@
 package com.alivro.spring.sleepyringtail.service.impl;
 
+import com.alivro.spring.sleepyringtail.constants.MessageConstants;
 import com.alivro.spring.sleepyringtail.dao.ProductDao;
 import com.alivro.spring.sleepyringtail.exception.DataAlreadyExistsException;
 import com.alivro.spring.sleepyringtail.exception.DataNotFoundException;
@@ -23,9 +24,11 @@ import java.util.Optional;
 
 @Service
 public class IProductServiceImpl implements IProductService {
-    private final ProductDao productDao;
-    private final ModelMapper modelMapper = new ModelMapper();
+    private static final String MESSAGE_FORMAT = "{} {}: {}";
     private final Logger logger = LoggerFactory.getLogger(IProductServiceImpl.class);
+    private final ModelMapper modelMapper = new ModelMapper();
+    private final ProductDao productDao;
+
 
     /**
      * Constructor
@@ -44,7 +47,7 @@ public class IProductServiceImpl implements IProductService {
      */
     @Override
     public CustomPaginationData<ProductGenericResponseDto, Product> findAll(Pageable pageable) {
-        logger.info("Busca todos los productos.");
+        logger.info(MessageConstants.FIND_ALL_PRODUCTS);
 
         Page<Product> productsPage = productDao.findAll(pageable);
 
@@ -65,7 +68,7 @@ public class IProductServiceImpl implements IProductService {
      */
     @Override
     public CustomPaginationData<ProductGenericResponseDto, Product> findAllByName(String word, Pageable pageable) {
-        logger.info("Busca todos los productos. Nombre: {} ", word);
+        logger.info(MESSAGE_FORMAT, MessageConstants.FIND_ALL_PRODUCTS, MessageConstants.NAME, word);
 
         Page<Product> productPage = productDao.findByNameContainingIgnoreCase(word, pageable);
 
@@ -86,7 +89,7 @@ public class IProductServiceImpl implements IProductService {
      */
     @Override
     public CustomPaginationData<ProductGenericResponseDto, Product> findAllByDescription(String word, Pageable pageable) {
-        logger.info("Busca todos los productos. Descripción: {} ", word);
+        logger.info(MESSAGE_FORMAT, MessageConstants.FIND_ALL_PRODUCTS, MessageConstants.DESCRIPTION, word);
 
         Page<Product> productPage = productDao.findByDescriptionContainingIgnoreCase(word, pageable);
 
@@ -106,14 +109,14 @@ public class IProductServiceImpl implements IProductService {
      */
     @Override
     public ProductGetResponseDto findById(Integer id) {
-        logger.info("Busca producto. ID: {}", id);
+        logger.info(MESSAGE_FORMAT, MessageConstants.FIND_PRODUCT, MessageConstants.ID, id);
 
         Optional<Product> foundProduct = productDao.findById(id);
 
         if (foundProduct.isEmpty()) {
-            logger.info("Producto no encontrada. ID: {}", id);
+            logger.info(MessageConstants.PRODUCT_NOT_FOUND);
 
-            throw new DataNotFoundException("Product not found!");
+            throw new DataNotFoundException(MessageConstants.PRODUCT_NOT_FOUND);
         }
 
         return modelMapper.map(foundProduct.get(), ProductGetResponseDto.class);
@@ -129,18 +132,18 @@ public class IProductServiceImpl implements IProductService {
     public ProductGenericResponseDto save(ProductGenericRequestDto request) {
         String barcode = request.getBarcode();
 
-        logger.info("Busca producto. Código de barras: {}", barcode);
+        logger.info(MESSAGE_FORMAT, MessageConstants.FIND_PRODUCT, MessageConstants.BARCODE, barcode);
 
         // Verifica si ya existe un producto con el mismo código de barras
         if (productDao.existsByBarcode(barcode)) {
-            logger.info("Producto existente. Código de barras: {}", barcode);
-            logger.info("Producto no guardado. Código de barras: {}", barcode);
+            logger.info(MessageConstants.PRODUCT_ALREADY_EXISTS);
+            logger.info(MessageConstants.PRODUCT_NOT_SAVED);
 
-            throw new DataAlreadyExistsException("Product already exists!");
+            throw new DataAlreadyExistsException(MessageConstants.PRODUCT_ALREADY_EXISTS);
         }
 
-        logger.info("Producto no existente. Código de barras: {}", barcode);
-        logger.info("Guarda producto. Código de barras: {}", barcode);
+        logger.info(MessageConstants.PRODUCT_NOT_FOUND);
+        logger.info(MessageConstants.SAVE_PRODUCT);
 
         // Guarda la información del nuevo producto
         Product savedProduct = productDao.save(
@@ -159,16 +162,16 @@ public class IProductServiceImpl implements IProductService {
      */
     @Override
     public ProductGenericResponseDto update(Integer id, ProductGenericRequestDto request) {
-        logger.info("Busca producto. ID: {}", id);
+        logger.info(MESSAGE_FORMAT, MessageConstants.FIND_PRODUCT, MessageConstants.ID, id);
 
         Optional<Product> foundProduct = productDao.findById(id);
 
-        // Verifica si existe un producto con ese id
+        // Verifica si existe una subcategoría con el ID dado
         if (foundProduct.isEmpty()) {
-            logger.info("Producto no existente. ID: {}", id);
-            logger.info("Producto no actualizado. ID: {}", id);
+            logger.info(MessageConstants.PRODUCT_NOT_FOUND);
+            logger.info(MessageConstants.PRODUCT_NOT_UPDATED);
 
-            throw new DataNotFoundException("Product does not exist!");
+            throw new DataNotFoundException(MessageConstants.PRODUCT_NOT_FOUND);
         }
 
         // Información del producto a actualizar
@@ -182,7 +185,8 @@ public class IProductServiceImpl implements IProductService {
         productToUpdate.setBarcode(request.getBarcode());
         productToUpdate.setSubcategory(subcategory);
 
-        logger.info("Actualiza producto. ID: {}", id);
+        logger.info(MessageConstants.PRODUCT_EXISTS);
+        logger.info(MessageConstants.UPDATE_PRODUCT);
 
         // Actualiza la información del producto
         Product updatedProduct = productDao.save(productToUpdate);
@@ -197,7 +201,7 @@ public class IProductServiceImpl implements IProductService {
      */
     @Override
     public void deleteById(Integer id) {
-        logger.info("Elimina producto. ID: {}", id);
+        logger.info(MESSAGE_FORMAT, MessageConstants.DELETE_PRODUCT, MessageConstants.ID, id);
 
         productDao.deleteById(id);
     }

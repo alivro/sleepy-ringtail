@@ -1,5 +1,6 @@
 package com.alivro.spring.sleepyringtail.controller;
 
+import com.alivro.spring.sleepyringtail.constants.MessageConstants;
 import com.alivro.spring.sleepyringtail.handler.ResponseHandler;
 import com.alivro.spring.sleepyringtail.model.Inventory;
 import com.alivro.spring.sleepyringtail.model.inventory.request.InventoryGenericRequestDto;
@@ -23,8 +24,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/inventory")
 @CrossOrigin(origins = "http://localhost:4200")
 public class InventoryController {
-    private final IInventoryService inventoryService;
     private final Logger logger = LoggerFactory.getLogger(InventoryController.class);
+    private final IInventoryService inventoryService;
 
     /**
      * Constructor
@@ -37,9 +38,9 @@ public class InventoryController {
     }
 
     /**
-     * Endpoint para buscar el stock de todos los productos
+     * Endpoint para buscar el inventario de todos los productos
      *
-     * @return Información del stock de todos los productos
+     * @return Información del inventario de todos los productos
      */
     @GetMapping("/getAll")
     public ResponseEntity<CustomResponse<InventoryGenericResponseDto, CustomPageMetadata>> getAllInventory(
@@ -47,64 +48,64 @@ public class InventoryController {
             Pageable pageable) {
         CustomPaginationData<InventoryGenericResponseDto, Inventory> inventoryData = inventoryService.findAll(pageable);
 
-        logger.info("Stock de productos encontrados.");
+        logger.info(MessageConstants.FOUND_ALL_INVENTORY);
 
         return ResponseHandler.sendResponse(
-                HttpStatus.OK, "Found product stocks!", inventoryData.getData(), inventoryData.getMetadata()
+                HttpStatus.OK, MessageConstants.FOUND_ALL_INVENTORY, inventoryData.getData(), inventoryData.getMetadata()
         );
     }
 
     /**
-     * Endpoint para buscar el stock de un producto por su ID
+     * Endpoint para buscar el inventario de un producto por su ID
      *
      * @param id Identificador único del producto en el inventario
-     * @return Información del stock del producto buscado
+     * @return Información del inventario del producto buscado
      */
     @GetMapping("/get/{id}")
     public ResponseEntity<CustomResponse<InventoryGenericResponseDto, Void>> getInventory(@PathVariable("id") Integer id) {
-        InventoryGenericResponseDto foundProductStock = inventoryService.findById(id);
+        InventoryGenericResponseDto foundInventory = inventoryService.findById(id);
 
-        logger.info("Stock del producto encontrado. ID: {}", id);
+        logger.info(MessageConstants.FOUND_INVENTORY);
 
         return ResponseHandler.sendResponse(
-                HttpStatus.OK, "Found product stock!", foundProductStock
+                HttpStatus.OK, MessageConstants.FOUND_INVENTORY, foundInventory
         );
     }
 
     /**
-     * Endpoint para guardar la información del stock de un producto
+     * Endpoint para guardar la información del inventario de un producto
      *
-     * @param request Información del stock del producto a guardar
-     * @return Información del stock del producto guardado
+     * @param request Información del inventario del producto a guardar
+     * @return Información del inventario del producto guardado
      */
     @PostMapping("/save")
     public ResponseEntity<CustomResponse<InventoryGenericResponseDto, Void>> saveInventory(
             @Valid @RequestBody InventoryGenericRequestDto request) {
-        InventoryGenericResponseDto savedProductStock = inventoryService.save(request);
+        InventoryGenericResponseDto savedInventory = inventoryService.save(request);
 
-        logger.info("Stock del producto guardado. ID: {}", savedProductStock.getId());
+        logger.info(MessageConstants.SAVED_INVENTORY);
 
         return ResponseHandler.sendResponse(
-                HttpStatus.CREATED, "Saved inventory stock!", savedProductStock
+                HttpStatus.CREATED, MessageConstants.SAVED_INVENTORY, savedInventory
         );
     }
 
     /**
-     * Endpoint para actualizar la información del stock de un producto
+     * Endpoint para actualizar la información del inventario de un producto
      *
      * @param id      Identificador único del producto en el inventario
-     * @param request Información del stock del producto a actualizar
-     * @return Información del stock del producto actualizado
+     * @param request Información del inventario del producto a actualizar
+     * @return Información del inventario del producto actualizado
      */
     @PutMapping("/update/{id}")
     public ResponseEntity<CustomResponse<InventoryGenericResponseDto, Void>> updateInventory(
             @PathVariable("id") Integer id, @Valid @RequestBody InventoryGenericRequestDto request) {
-        InventoryGenericResponseDto updatedProductStock = inventoryService.update(id, request);
+        InventoryGenericResponseDto updatedInventory = inventoryService.update(id, request);
 
-        logger.info("Stock del producto actualizado. ID: {}", id);
+        logger.info(MessageConstants.UPDATED_INVENTORY);
 
         return ResponseHandler.sendResponse(
-                HttpStatus.OK, "Updated stock product!", updatedProductStock
+                HttpStatus.OK, MessageConstants.UPDATED_INVENTORY, updatedInventory
         );
     }
 
@@ -118,10 +119,10 @@ public class InventoryController {
     public ResponseEntity<CustomResponse<Void, Void>> deleteInventory(@PathVariable("id") Integer id) {
         inventoryService.deleteById(id);
 
-        logger.info("Stock del producto eliminado. ID: {}", id);
+        logger.info(MessageConstants.DELETED_INVENTORY);
 
         return ResponseHandler.sendResponse(
-                HttpStatus.OK, "Deleted product stock!"
+                HttpStatus.OK, MessageConstants.DELETED_INVENTORY
         );
     }
 }
